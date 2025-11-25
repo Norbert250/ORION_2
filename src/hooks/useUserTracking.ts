@@ -72,7 +72,7 @@ export const useUserTracking = (phoneNumber: string, currentStep: number) => {
 
   const trackFieldChange = (fieldName: string) => {
     console.log('Tracking field change:', fieldName, 'Session:', sessionId.current, 'Initialized:', isInitialized.current);
-    if (sessionId.current && isInitialized.current) {
+    if (sessionId.current && isInitialized.current && navigator.onLine) {
       const updateField = async () => {
         try {
           await DatabaseService.updateUserSession(sessionId.current, { current_field: fieldName });

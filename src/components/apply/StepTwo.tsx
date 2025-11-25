@@ -35,7 +35,9 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
   const overallScore = (medicalScore || assetScore || behaviorScore) ? 
     Math.round(((medicalScore || 0) + (assetScore || 0) + (behaviorScore || 0)) / 3) : 0;
 
-  const analyzeFiles = async (files: File[], endpoint: string) => {
+  const analyzeFiles = async (files: File[], endpoint: string, retries = 3) => {
+    if (!navigator.onLine) throw new Error('No internet connection');
+    
     const formData = new FormData();
     formData.append('user_id', '12345');
     
@@ -43,69 +45,68 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
       formData.append('files', file);
     });
     
-    console.log('Sending to:', `https://orionapisalpha.onrender.com${endpoint}`);
-    console.log('FormData entries:');
-    for (let [key, value] of formData.entries()) {
-      console.log(key, value);
+    for (let i = 0; i < retries; i++) {
+      try {
+        const response = await fetch(`https://orionapisalpha.onrender.com${endpoint}`, {
+          method: 'POST',
+          body: formData,
+          signal: AbortSignal.timeout(30000)
+        });
+        
+        if (!response.ok) throw new Error(`API call failed: ${response.statusText}`);
+        return await response.json();
+      } catch (error) {
+        if (i === retries - 1) throw error;
+        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+      }
     }
-    
-    const response = await fetch(`https://orionapisalpha.onrender.com${endpoint}`, {
-      method: 'POST',
-      body: formData,
-    });
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('API Error:', errorText);
-      throw new Error(`API call failed: ${response.statusText}`);
-    }
-    
-    const result = await response.json();
-    console.log('API Response:', result);
-    return result;
   };
 
-  const predictMedicalNeeds = async (drugNames: string[]) => {
-    console.log('Sending medicines as array:', drugNames);
+  const predictMedicalNeeds = async (drugNames: string[], retries = 3) => {
+    if (!navigator.onLine) throw new Error('No internet connection');
     
-    const response = await fetch('https://orionapisalpha.onrender.com/medical_needs/predict', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ medicines: drugNames }),
-    });
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Medical needs API Error:', errorText);
-      throw new Error(`Medical needs prediction failed: ${response.statusText}`);
+    for (let i = 0; i < retries; i++) {
+      try {
+        const response = await fetch('https://orionapisalpha.onrender.com/medical_needs/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ medicines: drugNames }),
+          signal: AbortSignal.timeout(30000)
+        });
+        
+        if (!response.ok) throw new Error(`Medical needs prediction failed: ${response.statusText}`);
+        return await response.json();
+      } catch (error) {
+        if (i === retries - 1) throw error;
+        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+      }
     }
-    
-    const result = await response.json();
-    console.log('Medical needs response:', result);
-    return result;
   };
 
-  const scoreMedical = async (medicalConditions: string[]) => {
-    const response = await fetch('https://orionapisalpha.onrender.com/medical_scoring/score', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        user_id: '12345',
-        age: parseInt(formData.age) || 25,
-        conditions: medicalConditions,
-        tests: []
-      }),
-    });
+  const scoreMedical = async (medicalConditions: string[], retries = 3) => {
+    if (!navigator.onLine) throw new Error('No internet connection');
     
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Medical scoring API Error:', errorText);
-      throw new Error(`Medical scoring failed: ${response.statusText}`);
+    for (let i = 0; i < retries; i++) {
+      try {
+        const response = await fetch('https://orionapisalpha.onrender.com/medical_scoring/score', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            user_id: '12345',
+            age: parseInt(formData.age) || 25,
+            conditions: medicalConditions,
+            tests: []
+          }),
+          signal: AbortSignal.timeout(30000)
+        });
+        
+        if (!response.ok) throw new Error(`Medical scoring failed: ${response.statusText}`);
+        return await response.json();
+      } catch (error) {
+        if (i === retries - 1) throw error;
+        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+      }
     }
-    
-    const result = await response.json();
-    console.log('Medical scoring response:', result);
-    return result;
   };
 
   const handleNext = async () => {

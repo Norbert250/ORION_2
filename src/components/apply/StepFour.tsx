@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { ApplicationFormData } from "@/types/form";
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
+import { CircularProgress } from "@/components/CircularProgress";
 
 
 interface StepFourProps {
