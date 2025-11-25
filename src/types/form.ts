@@ -1,0 +1,37 @@
+export interface ApplicationFormData {
+  applicationId?: string;
+  phoneNumber: string;
+  occupation: string;
+  sector: string;
+  workType: string;
+  sex: string;
+  age: string;
+  medicalPrescription: File[];
+  drugImage: File[];
+  assetPictures: File[];
+  bankStatement: File | null;
+  mpesaStatement: File | null;
+  homePhoto: File | null;
+  hasBusiness: boolean;
+  businessPhoto: File | null;
+  tinNumber: string;
+  callLogHistory: File | null;
+  guarantor1Id: File | null;
+  guarantor2Id: File | null;
+  guarantor1Phone: string;
+  guarantor2Phone: string;
+  prescriptionAnalysis?: any;
+  drugAnalysis?: any;
+  medicalNeeds?: any;
+  medicalScore?: any;
+  assetAnalysis?: any;
+  bankAnalysis?: any;
+  mpesaAnalysis?: any;
+  bankScore?: any;
+  creditEvaluation?: any;
+  callLogsAnalysis?: any;
+  guarantor1IdAnalysis?: any;
+  guarantor2IdAnalysis?: any;
+  bankPassword?: string;
+  mpesaPassword?: string;
+}

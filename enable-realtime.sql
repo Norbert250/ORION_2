@@ -1,0 +1,10 @@
+-- Enable real-time for all tables
+ALTER PUBLICATION supabase_realtime ADD TABLE applications;
+ALTER PUBLICATION supabase_realtime ADD TABLE medical_analysis;
+ALTER PUBLICATION supabase_realtime ADD TABLE credit_evaluation;
+ALTER PUBLICATION supabase_realtime ADD TABLE call_logs_analysis;
+ALTER PUBLICATION supabase_realtime ADD TABLE asset_analysis;
+ALTER PUBLICATION supabase_realtime ADD TABLE bank_analysis;
+ALTER PUBLICATION supabase_realtime ADD TABLE mpesa_analysis;
+ALTER PUBLICATION supabase_realtime ADD TABLE gps_analysis;
+ALTER PUBLICATION supabase_realtime ADD TABLE id_analysis;
