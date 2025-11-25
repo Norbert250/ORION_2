@@ -42,10 +42,10 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
   };
   
   const getCreditLimit = (score: number) => {
-    if (score >= 80) return '$25,000';
-    if (score >= 70) return '$15,000';
-    if (score >= 60) return '$10,000';
-    return '$5,000';
+    if (score >= 80) return 'KSh 2,500,000';
+    if (score >= 70) return 'KSh 1,500,000';
+    if (score >= 60) return 'KSh 1,000,000';
+    return 'KSh 500,000';
   };
   
   const getAPR = (score: number) => {
@@ -171,7 +171,7 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
               
               <div className="grid grid-cols-2 gap-y-1.5 sm:gap-y-2 text-xs sm:text-sm">
                 <div className="text-muted-foreground text-left">Annual Cost Est.</div>
-                <div className="font-semibold text-foreground text-right">$4,500</div>
+                <div className="font-semibold text-foreground text-right">KSh 450,000</div>
                 <div className="text-muted-foreground text-left">Condition Type</div>
                 <div className="font-semibold text-foreground text-right">Chronic</div>
                 <div className="text-muted-foreground text-left">Refill Frequency</div>
@@ -226,11 +226,11 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
               
               <div className="grid grid-cols-2 gap-y-1.5 sm:gap-y-2 text-xs sm:text-sm">
                 <div className="text-muted-foreground text-left">Total Assets</div>
-                <div className="font-semibold text-foreground text-right">$85,000</div>
+                <div className="font-semibold text-foreground text-right">KSh 8,500,000</div>
                 <div className="text-muted-foreground text-left">Debt-to-Income</div>
                 <div className="font-semibold text-foreground text-right">32%</div>
                 <div className="text-muted-foreground text-left">Monthly Income</div>
-                <div className="font-semibold text-foreground text-right">$5,200</div>
+                <div className="font-semibold text-foreground text-right">KSh 520,000</div>
               </div>
 
               <div className={`inline-block px-3 sm:px-4 py-1 ${assetTier.badge} rounded-full text-xs sm:text-sm font-medium`}>

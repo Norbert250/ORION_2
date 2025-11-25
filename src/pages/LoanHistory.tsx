@@ -43,10 +43,10 @@ const LoanHistory = () => {
   };
 
   const getLoanAmount = (creditScore: number) => {
-    if (creditScore >= 750) return '$25,000';
-    if (creditScore >= 700) return '$15,000';
-    if (creditScore >= 650) return '$10,000';
-    return '$5,000';
+    if (creditScore >= 750) return 'KSh 2,500,000';
+    if (creditScore >= 700) return 'KSh 1,500,000';
+    if (creditScore >= 650) return 'KSh 1,000,000';
+    return 'KSh 500,000';
   };
 
   const getStatusBadge = (status: string) => {
