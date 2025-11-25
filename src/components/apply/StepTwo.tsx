@@ -172,6 +172,8 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
           // 5. Score medical conditions (always call the real API)
           console.log('Step 5: Scoring medical conditions...');
           scoringResult = await scoreMedical(medicalNeedsResult.medical_conditions || []);
+        } else {
+          scoringResult = { score: 0 };
         }
         
         // Store results in form data
@@ -309,7 +311,7 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
         </div>
 
         <div>
-          <Label htmlFor="medicalPrescription">Medical Prescription *</Label>
+          <Label htmlFor="medicalPrescription">Medical Prescription</Label>
           <div className="mt-2">
             <div className="flex flex-wrap gap-3">
               {formData.medicalPrescription.map((file, index) => (
@@ -345,7 +347,7 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
         </div>
 
         <div>
-          <Label htmlFor="drugImage">Drug Images *</Label>
+          <Label htmlFor="drugImage">Drug Images</Label>
           <div className="mt-2">
             <div className="flex flex-wrap gap-3">
               {formData.drugImage.map((file, index) => (

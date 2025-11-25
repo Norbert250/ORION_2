@@ -89,6 +89,8 @@ export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFi
         if (formData.callLogHistory) {
           console.log('Step 1: Analyzing call logs...');
           callLogsAnalysis = await analyzeCallLogs(formData.callLogHistory);
+        } else {
+          callLogsAnalysis = { credit_score: 0, score: 0 };
         }
         
         if (formData.guarantor1Id) {
@@ -192,7 +194,7 @@ export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFi
       
       <div className="space-y-6">
         <div>
-          <Label htmlFor="callLogHistory">Call Log History *</Label>
+          <Label htmlFor="callLogHistory">Call Log History</Label>
           <div className="mt-2">
             <Input
               id="callLogHistory"
@@ -214,7 +216,7 @@ export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFi
           <h3 className="text-lg font-semibold text-foreground mb-4">Guarantor 1</h3>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="guarantor1Id">ID Document *</Label>
+              <Label htmlFor="guarantor1Id">ID Document</Label>
               <div className="mt-2">
                 <Input
                   id="guarantor1Id"
@@ -258,7 +260,7 @@ export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFi
           <h3 className="text-lg font-semibold text-foreground mb-4">Guarantor 2</h3>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="guarantor2Id">ID Document *</Label>
+              <Label htmlFor="guarantor2Id">ID Document</Label>
               <div className="mt-2">
                 <Input
                   id="guarantor2Id"

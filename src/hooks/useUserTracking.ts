@@ -28,6 +28,12 @@ export const useUserTracking = (phoneNumber: string, currentStep: number) => {
       DatabaseService.updateUserSession(sessionId.current, { status: 'left' });
     };
 
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        DatabaseService.updateUserSession(sessionId.current, { status: 'left' });
+      }
+    };
+
     let currentUrl = window.location.href;
     
     const checkUrlChange = () => {
@@ -40,9 +46,11 @@ export const useUserTracking = (phoneNumber: string, currentStep: number) => {
     const urlCheckInterval = setInterval(checkUrlChange, 1000);
     
     window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       clearInterval(urlCheckInterval);
     };
   }, [phoneNumber]);

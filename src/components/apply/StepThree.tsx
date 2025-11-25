@@ -320,6 +320,8 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
           
           console.log('Step 2: Evaluating credit...');
           creditEvaluation = await evaluateCredit(assetAnalysis, null);
+        } else {
+          creditEvaluation = { credit_score: 0 };
         }
         
         if (formData.bankStatement) {
@@ -328,11 +330,15 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
           
           console.log('Step 5: Scoring bank statement...');
           bankScore = await scoreBankStatement(bankAnalysis);
+        } else {
+          bankScore = { bank_statement_credit_score: 0 };
         }
         
         if (formData.mpesaStatement) {
           console.log('Step 4: Analyzing M-Pesa statement...');
           mpesaAnalysis = await analyzeMpesaStatement(formData.mpesaStatement, formData.mpesaPassword);
+        } else {
+          mpesaAnalysis = { score: 0 };
         }
         
         updateFormData({
@@ -428,7 +434,7 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
       
       <div className="space-y-6">
         <div>
-          <Label htmlFor="assetPictures">Asset Pictures * (Minimum 3 required)</Label>
+          <Label htmlFor="assetPictures">Asset Pictures</Label>
           <div className="mt-2">
             <div className="flex flex-wrap gap-3">
               {formData.assetPictures.map((file, index) => (
@@ -472,7 +478,7 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
         </div>
 
         <div>
-          <Label htmlFor="bankStatement">Bank Statement *</Label>
+          <Label htmlFor="bankStatement">Bank Statement</Label>
           <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-2">
             <div className="md:col-span-2">
               <Input
@@ -502,7 +508,7 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
         </div>
 
         <div>
-          <Label htmlFor="mpesaStatement">M-Pesa Statement *</Label>
+          <Label htmlFor="mpesaStatement">M-Pesa Statement</Label>
           <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-2">
             <div className="md:col-span-2">
               <Input
@@ -532,7 +538,7 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
         </div>
 
         <div>
-          <Label htmlFor="homePhoto">Photo of Your Home *</Label>
+          <Label htmlFor="homePhoto">Photo of Your Home</Label>
           <div className="mt-2">
             <Input
               id="homePhoto"
@@ -571,7 +577,7 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
         {formData.hasBusiness && (
           <div className="space-y-4 pl-6 border-l-2 border-primary">
             <div>
-              <Label htmlFor="businessPhoto">Photo of Business *</Label>
+              <Label htmlFor="businessPhoto">Photo of Business</Label>
               <div className="mt-2">
                 <Input
                   id="businessPhoto"
@@ -591,7 +597,7 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
             </div>
 
             <div>
-              <Label htmlFor="tinNumber">TIN Number *</Label>
+              <Label htmlFor="tinNumber">TIN Number</Label>
               <Input
                 id="tinNumber"
                 type="text"
