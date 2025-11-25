@@ -1,4 +1,4 @@
-import { supabase } from './supabase'
+import { supabase } from './supabase-new'
 import { ApplicationFormData } from '@/types/form'
 
 export class DatabaseService {

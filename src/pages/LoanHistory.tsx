@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Activity, ArrowLeft, DollarSign, Calendar, CreditCard, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase-new";
 
 const LoanHistory = () => {
   const navigate = useNavigate();

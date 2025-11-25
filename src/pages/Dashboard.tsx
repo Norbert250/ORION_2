@@ -1,15 +1,26 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { CircularProgress } from "@/components/CircularProgress";
 import { GradientCircularProgress } from "@/components/GradientCircularProgress";
 import { Activity, RefreshCw, FileDown } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ApplicationFormData } from "@/types/form";
 
-const Dashboard = () => {
+interface DashboardProps {
+  formData?: ApplicationFormData;
+  isAdminMode?: boolean;
+}
+
+const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const formData = location.state?.formData as ApplicationFormData;
+  const formData = propFormData || (location.state?.formData as ApplicationFormData);
+  
+  const [showApiData, setShowApiData] = useState(false);
+  const [selectedApiData, setSelectedApiData] = useState<any>(null);
+  const [apiDataTitle, setApiDataTitle] = useState("");
   
   // Calculate dynamic scores from API responses
   const medicalScore = formData?.medicalScore?.scoring?.total_score || 
@@ -24,23 +35,23 @@ const Dashboard = () => {
   
   // Determine risk level
   const getRiskLevel = (score: number) => {
-    if (score >= 750) return 'EXCELLENT';
-    if (score >= 700) return 'GOOD';
-    if (score >= 650) return 'FAIR';
+    if (score >= 80) return 'EXCELLENT';
+    if (score >= 70) return 'GOOD';
+    if (score >= 60) return 'FAIR';
     return 'POOR';
   };
   
   const getCreditLimit = (score: number) => {
-    if (score >= 750) return '$25,000';
-    if (score >= 700) return '$15,000';
-    if (score >= 650) return '$10,000';
+    if (score >= 80) return '$25,000';
+    if (score >= 70) return '$15,000';
+    if (score >= 60) return '$10,000';
     return '$5,000';
   };
   
   const getAPR = (score: number) => {
-    if (score >= 750) return '6.99%';
-    if (score >= 700) return '9.99%';
-    if (score >= 650) return '12.99%';
+    if (score >= 80) return '6.99%';
+    if (score >= 70) return '9.99%';
+    if (score >= 60) return '12.99%';
     return '18.99%';
   };
   
@@ -87,7 +98,7 @@ const Dashboard = () => {
             <div className="flex justify-center">
               <GradientCircularProgress
                 value={overallScore}
-                max={850}
+                max={100}
                 size={180}
                 strokeWidth={14}
                 gradientId="scoreGradient"
@@ -100,7 +111,7 @@ const Dashboard = () => {
               >
                 <div className="text-center">
                   <div className="text-4xl sm:text-5xl md:text-6xl font-bold text-white">{overallScore}</div>
-                  <div className="text-white/70 text-xs sm:text-sm mt-1">/ 850</div>
+                  <div className="text-white/70 text-xs sm:text-sm mt-1">/ 100</div>
                 </div>
               </GradientCircularProgress>
             </div>
@@ -123,7 +134,20 @@ const Dashboard = () => {
         </Card>
 
         {/* Medical Needs */}
-        <Card className="p-4 sm:p-6">
+        <Card 
+          className={`p-4 sm:p-6 ${isAdminMode ? 'cursor-pointer hover:shadow-lg transition-shadow' : ''}`}
+          onClick={(e) => {
+            if (isAdminMode) {
+              e.stopPropagation();
+              setSelectedApiData({
+                medicalScore: formData?.medicalScore,
+                medicalAnalysis: formData?.medicalAnalysis
+              });
+              setApiDataTitle("Medical Analysis Data");
+              setShowApiData(true);
+            }
+          }}
+        >
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center">
             <CircularProgress
               value={medicalScore}
@@ -162,7 +186,23 @@ const Dashboard = () => {
         </Card>
 
         {/* Asset Valuation */}
-        <Card className="p-4 sm:p-6">
+        <Card 
+          className={`p-4 sm:p-6 ${isAdminMode ? 'cursor-pointer hover:shadow-lg transition-shadow' : ''}`}
+          onClick={(e) => {
+            if (isAdminMode) {
+              e.stopPropagation();
+              setSelectedApiData({
+                creditEvaluation: formData?.creditEvaluation,
+                assetAnalysis: formData?.assetAnalysis,
+                bankAnalysis: formData?.bankAnalysis,
+                bankScore: formData?.bankScore,
+                mpesaAnalysis: formData?.mpesaAnalysis
+              });
+              setApiDataTitle("Asset & Financial Analysis Data");
+              setShowApiData(true);
+            }
+          }}
+        >
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center">
             <CircularProgress
               value={assetScore}
@@ -201,7 +241,20 @@ const Dashboard = () => {
         </Card>
 
         {/* Behavioral Risk */}
-        <Card className="p-4 sm:p-6">
+        <Card 
+          className={`p-4 sm:p-6 ${isAdminMode ? 'cursor-pointer hover:shadow-lg transition-shadow' : ''}`}
+          onClick={(e) => {
+            if (isAdminMode) {
+              e.stopPropagation();
+              setSelectedApiData({
+                callLogsAnalysis: formData?.callLogsAnalysis,
+                behaviorAnalysis: formData?.behaviorAnalysis
+              });
+              setApiDataTitle("Behavioral Risk Analysis Data");
+              setShowApiData(true);
+            }
+          }}
+        >
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center">
             <CircularProgress
               value={behaviorScore}
@@ -260,7 +313,19 @@ const Dashboard = () => {
           </Button>
         </div>
 
-
+        {/* API Data Dialog */}
+        <Dialog open={showApiData} onOpenChange={setShowApiData}>
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>{apiDataTitle}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <pre className="bg-muted p-4 rounded text-sm overflow-auto whitespace-pre-wrap">
+                {JSON.stringify(selectedApiData, null, 2)}
+              </pre>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

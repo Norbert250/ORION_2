@@ -7,8 +7,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Eye, Users, FileText, TrendingUp, Calendar, CheckCircle, XCircle, FileCheck } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase-new";
 import { DatabaseService } from "@/lib/database";
+import Dashboard from "./Dashboard";
 
 interface Application {
   id: string;
@@ -322,67 +323,35 @@ const AdminDashboard = () => {
                                 <FileCheck className="h-4 w-4" />
                               </Button>
                             </DialogTrigger>
-                          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-                            <DialogHeader>
-                              <DialogTitle>Application Details - {app.loan_id}</DialogTitle>
-                            </DialogHeader>
-                            {selectedApplication && (
-                              <Tabs defaultValue="overview" className="w-full">
-                                <TabsList className="grid w-full grid-cols-4">
-                                  <TabsTrigger value="overview">Overview</TabsTrigger>
-                                  <TabsTrigger value="medical">Medical</TabsTrigger>
-                                  <TabsTrigger value="assets">Assets</TabsTrigger>
-                                  <TabsTrigger value="behavior">Behavior</TabsTrigger>
-                                </TabsList>
-                                
-                                <TabsContent value="overview" className="space-y-4">
-                                  <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                      <h4 className="font-semibold">Application Info</h4>
-                                      <p>Loan ID: {selectedApplication.loan_id}</p>
-                                      <p>User ID: {selectedApplication.user_id}</p>
-                                      <p>Status: {getStatusBadge(selectedApplication.status)}</p>
-                                      <p>Created: {new Date(selectedApplication.created_at).toLocaleString()}</p>
-                                    </div>
-                                    <div>
-                                      <h4 className="font-semibold">Scores</h4>
-                                      <p>Medical: <span className={getScoreColor(app.medical_score)}>{app.medical_score}%</span></p>
-                                      <p>Assets: <span className={getScoreColor(app.asset_score)}>{app.asset_score}%</span></p>
-                                      <p>Behavior: <span className={getScoreColor(app.behavior_score)}>{app.behavior_score}%</span></p>
-                                    </div>
-                                  </div>
-                                </TabsContent>
-                                
-                                <TabsContent value="medical">
-                                  <div className="space-y-2">
-                                    <h4 className="font-semibold">Medical Analysis</h4>
-                                    <pre className="bg-muted p-4 rounded text-sm overflow-auto">
-                                      {JSON.stringify(selectedApplication.medical_analysis, null, 2)}
-                                    </pre>
-                                  </div>
-                                </TabsContent>
-                                
-                                <TabsContent value="assets">
-                                  <div className="space-y-2">
-                                    <h4 className="font-semibold">Asset Analysis</h4>
-                                    <pre className="bg-muted p-4 rounded text-sm overflow-auto">
-                                      {JSON.stringify(selectedApplication.asset_analysis, null, 2)}
-                                    </pre>
-                                  </div>
-                                </TabsContent>
-                                
-                                <TabsContent value="behavior">
-                                  <div className="space-y-2">
-                                    <h4 className="font-semibold">Behavior Analysis</h4>
-                                    <pre className="bg-muted p-4 rounded text-sm overflow-auto">
-                                      {JSON.stringify(selectedApplication.call_logs_analysis, null, 2)}
-                                    </pre>
-                                  </div>
-                                </TabsContent>
-                              </Tabs>
-                            )}
-                          </DialogContent>
-                        </Dialog>
+                            <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                              <DialogHeader>
+                                <DialogTitle>Application Review - {app.loan_id}</DialogTitle>
+                              </DialogHeader>
+                              {selectedApplication ? (
+                                <Dashboard 
+                                  formData={{
+                                    medicalScore: selectedApplication.medical_analysis?.[0]?.medical_score,
+                                    medicalAnalysis: selectedApplication.medical_analysis?.[0],
+                                    creditEvaluation: selectedApplication.credit_evaluation?.[0],
+                                    assetAnalysis: selectedApplication.asset_analysis?.[0],
+                                    bankAnalysis: selectedApplication.bank_analysis?.[0],
+                                    bankScore: selectedApplication.bank_analysis?.[0]?.bank_score,
+                                    mpesaAnalysis: selectedApplication.mpesa_analysis?.[0],
+                                    callLogsAnalysis: selectedApplication.call_logs_analysis?.[0],
+                                    behaviorAnalysis: selectedApplication.call_logs_analysis?.[0],
+                                    gpsAnalysis: selectedApplication.gps_analysis?.[0],
+                                    idAnalysis: selectedApplication.id_analysis?.[0]
+                                  }} 
+                                  isAdminMode={true} 
+                                />
+                              ) : (
+                                <div className="flex items-center justify-center p-8">
+                                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                                  <span className="ml-2">Loading application details...</span>
+                                </div>
+                              )}
+                            </DialogContent>
+                          </Dialog>
                         
                         <Button 
                           variant="outline" 

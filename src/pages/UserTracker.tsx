@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DatabaseService } from "@/lib/database";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase-new";
 
 interface UserSession {
   id: string;

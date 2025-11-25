@@ -64,6 +64,8 @@ const Apply = () => {
 
 
 
+  console.log('Apply component rendering', { formData, currentStep });
+  
   return (
     <div className="min-h-screen bg-background p-3 sm:p-4 md:p-8">
       <div className="mx-auto max-w-3xl">

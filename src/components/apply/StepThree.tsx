@@ -24,10 +24,8 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
   
   // Calculate real-time scores from API responses
   const medicalScore = formData?.medicalScore?.scoring?.total_score || 
-                      formData?.medicalScore?.score || 
-                      formData?.bankScore?.bank_statement_credit_score || 0;
-  const assetScore = formData?.creditEvaluation?.credit_score || 
-                    formData?.assetAnalysis?.total_estimated_value || 0;
+                      formData?.medicalScore?.score || 0;
+  const assetScore = formData?.creditEvaluation?.credit_score || 0;
   const behaviorScore = formData?.callLogsAnalysis?.credit_score || 
                        formData?.callLogsAnalysis?.score || 0;
   
@@ -302,7 +300,6 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
       setIsLoading(true);
       trackFieldChange?.('stepThree_api_processing');
       try {
-        let gpsAnalysis = null;
         let assetAnalysis = null;
         let bankAnalysis = null;
         let mpesaAnalysis = null;
@@ -318,14 +315,11 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
         }
         
         if (allFiles.length > 0) {
-          console.log('Step 1: Analyzing GPS data...');
-          gpsAnalysis = await analyzeGPS(allFiles);
-          
-          console.log('Step 2: Analyzing assets...');
+          console.log('Step 1: Analyzing assets...');
           assetAnalysis = await analyzeAssets(allFiles);
           
-          console.log('Step 6: Evaluating credit...');
-          creditEvaluation = await evaluateCredit(assetAnalysis, gpsAnalysis);
+          console.log('Step 2: Evaluating credit...');
+          creditEvaluation = await evaluateCredit(assetAnalysis, null);
         }
         
         if (formData.bankStatement) {
@@ -342,7 +336,6 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
         }
         
         updateFormData({
-          gpsAnalysis: gpsAnalysis,
           assetAnalysis: assetAnalysis,
           bankAnalysis: bankAnalysis,
           mpesaAnalysis: mpesaAnalysis,
@@ -365,29 +358,69 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
   return (
     <Card className="p-6 md:p-8">
       <div className="mb-6">
-        <div className="flex justify-between text-sm mb-2">
-          <span className={medicalScore ? 'text-orange-600 font-semibold' : 'text-gray-400'}>Medical: {medicalScore || '--'}%</span>
-          <span className={assetScore ? 'text-yellow-600 font-semibold' : 'text-gray-400'}>Assets: {assetScore || '--'}%</span>
-          <span className={behaviorScore ? 'text-green-600 font-semibold' : 'text-gray-400'}>Behavior: {behaviorScore || '--'}%</span>
-        </div>
-        <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
-          <div className="h-full flex">
-            <div 
-              className={`transition-all duration-500 ${medicalScore ? 'bg-orange-500' : 'bg-gray-300'}`}
-              style={{ width: `${medicalScore ? (medicalScore / 3) : 33.33}%` }}
-            ></div>
-            <div 
-              className={`transition-all duration-500 ${assetScore ? 'bg-yellow-500' : 'bg-gray-300'}`}
-              style={{ width: `${assetScore ? (assetScore / 3) : 33.33}%` }}
-            ></div>
-            <div 
-              className={`transition-all duration-500 ${behaviorScore ? 'bg-green-500' : 'bg-gray-300'}`}
-              style={{ width: `${behaviorScore ? (behaviorScore / 3) : 33.33}%` }}
-            ></div>
+        <div className="flex items-center gap-4">
+          <div className="flex-1 h-5 bg-gray-200 rounded-full overflow-hidden relative">
+            <div className="h-full flex">
+              <div className="w-1/3 h-full bg-red-100 relative overflow-hidden">
+                <div 
+                  className="h-full bg-red-400 transition-all duration-500"
+                  style={{ width: `${medicalScore}%` }}
+                ></div>
+                <div className="absolute inset-0 flex items-center justify-center text-xs">
+                  <span className={`${medicalScore > 50 ? 'font-bold text-white' : 'text-gray-600'}`}>
+                    Medical: {medicalScore || '--'}%
+                  </span>
+                </div>
+              </div>
+              <div className="w-1/3 h-full bg-amber-100 relative overflow-hidden">
+                <div 
+                  className="h-full bg-amber-400 transition-all duration-500"
+                  style={{ width: `${assetScore}%` }}
+                ></div>
+                <div className="absolute inset-0 flex items-center justify-center text-xs">
+                  <span className={`${assetScore > 50 ? 'font-bold text-white' : 'text-gray-600'}`}>
+                    Assets: {assetScore || '--'}%
+                  </span>
+                </div>
+              </div>
+              <div className="w-1/3 h-full bg-green-100 relative overflow-hidden">
+                <div 
+                  className="h-full bg-green-400 transition-all duration-500"
+                  style={{ width: `${behaviorScore}%` }}
+                ></div>
+                <div className="absolute inset-0 flex items-center justify-center text-xs">
+                  <span className={`${behaviorScore > 50 ? 'font-bold text-white' : 'text-gray-600'}`}>
+                    Behavior: {behaviorScore || '--'}%
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="text-center mt-2">
-          <span className="text-lg font-bold">Overall Score: {overallScore}</span>
+          <div className="relative">
+            <CircularProgress
+              value={overallScore}
+              max={100}
+              size={60}
+              strokeWidth={6}
+              color="hsl(var(--primary))"
+              backgroundColor="hsl(var(--muted))"
+            >
+              <div className="text-center">
+                <div className="text-sm font-bold">{overallScore}</div>
+              </div>
+            </CircularProgress>
+            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 60 60">
+              <defs>
+                <path id="circle-path-step3" d="M 30,30 m -18,0 a 18,18 0 1,1 36,0 a 18,18 0 1,1 -36,0" />
+              </defs>
+              <text className="text-[7px] fill-gray-600">
+                <textPath href="#circle-path-step3">
+                  <animate attributeName="startOffset" values="0%;100%;0%" dur="8s" repeatCount="indefinite" />
+                  Overall Score
+                </textPath>
+              </text>
+            </svg>
+          </div>
         </div>
       </div>
 
