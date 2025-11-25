@@ -108,7 +108,7 @@ const AdminDashboard = () => {
           *,
           medical_analysis(medical_score),
           credit_evaluation(credit_score),
-          call_logs_analysis(credit_score)
+          call_logs_analysis(score)
         `)
         .order('created_at', { ascending: false });
 
@@ -118,7 +118,7 @@ const AdminDashboard = () => {
         ...app,
         medical_score: app.medical_analysis?.[0]?.medical_score?.scoring?.total_score || 0,
         asset_score: app.credit_evaluation?.[0]?.credit_score || 0,
-        behavior_score: app.call_logs_analysis?.[0]?.credit_score || 0
+        behavior_score: app.call_logs_analysis?.[0]?.score
       })) || [];
 
       setApplications(processedApps);
@@ -192,7 +192,7 @@ const AdminDashboard = () => {
     pending: applications.filter(app => app.status === 'pending').length,
     approved: applications.filter(app => app.status === 'approved').length,
     avgScore: applications.length > 0 
-      ? Math.round(applications.reduce((sum, app) => sum + ((app.medical_score + app.asset_score + app.behavior_score) / 3), 0) / applications.length)
+      ? Math.round(applications.reduce((sum, app) => sum + (((app.medical_score || 0) + (app.asset_score || 0) + (app.behavior_score || 0)) / 3), 0) / applications.length)
       : 0
   };
 
@@ -299,7 +299,7 @@ const AdminDashboard = () => {
               </TableHeader>
               <TableBody>
                 {filteredApplications.map((app) => {
-                  const overallScore = Math.round((app.medical_score + app.asset_score + app.behavior_score) / 3);
+                  const overallScore = Math.round(((app.medical_score || 0) + (app.asset_score || 0) + (app.behavior_score || 0)) / 3);
                   return (
                     <TableRow key={app.id}>
                       <TableCell className="font-medium">{app.loan_id}</TableCell>
