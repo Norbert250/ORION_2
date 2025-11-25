@@ -311,48 +311,72 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
         <div>
           <Label htmlFor="medicalPrescription">Medical Prescription *</Label>
           <div className="mt-2">
-            <Input
-              id="medicalPrescription"
-              type="file"
-              accept="image/*"
-              capture="environment"
-              multiple
-              onChange={(e) => updateFormData({ medicalPrescription: Array.from(e.target.files || []) })}
-              onFocus={() => trackFieldChange?.('medicalPrescription')}
-              className="cursor-pointer"
-            />
+            <div className="flex flex-wrap gap-3">
+              {formData.medicalPrescription.map((file, index) => (
+                <div key={index} className="relative w-16 h-16 group">
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt={`Prescription ${index + 1}`}
+                    className="w-full h-full object-cover rounded-lg border-2 border-gray-200 shadow-sm"
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded-lg transition-all duration-200"></div>
+                </div>
+              ))}
+              <label className="w-16 h-16 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-primary hover:bg-gray-50 transition-all duration-200 shadow-sm">
+                <span className="text-2xl text-gray-400 font-light">+</span>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  multiple
+                  onChange={(e) => {
+                    const newFiles = Array.from(e.target.files || []);
+                    updateFormData({ medicalPrescription: [...formData.medicalPrescription, ...newFiles] });
+                  }}
+                  onFocus={() => trackFieldChange?.('medicalPrescription')}
+                  className="hidden"
+                />
+              </label>
+            </div>
             <p className="text-xs text-green-600 font-medium mt-1">
               📋 Take a picture of your medical prescription
             </p>
-            {formData.medicalPrescription.length > 0 && (
-              <p className="text-sm text-muted-foreground mt-2">
-                Selected: {formData.medicalPrescription.length} file(s)
-              </p>
-            )}
           </div>
         </div>
 
         <div>
           <Label htmlFor="drugImage">Drug Images *</Label>
           <div className="mt-2">
-            <Input
-              id="drugImage"
-              type="file"
-              accept="image/*"
-              capture="environment"
-              multiple
-              onChange={(e) => updateFormData({ drugImage: Array.from(e.target.files || []) })}
-              onFocus={() => trackFieldChange?.('drugImage')}
-              className="cursor-pointer"
-            />
+            <div className="flex flex-wrap gap-3">
+              {formData.drugImage.map((file, index) => (
+                <div key={index} className="relative w-16 h-16 group">
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt={`Drug ${index + 1}`}
+                    className="w-full h-full object-cover rounded-lg border-2 border-gray-200 shadow-sm"
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded-lg transition-all duration-200"></div>
+                </div>
+              ))}
+              <label className="w-16 h-16 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-primary hover:bg-gray-50 transition-all duration-200 shadow-sm">
+                <span className="text-2xl text-gray-400 font-light">+</span>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  multiple
+                  onChange={(e) => {
+                    const newFiles = Array.from(e.target.files || []);
+                    updateFormData({ drugImage: [...formData.drugImage, ...newFiles] });
+                  }}
+                  onFocus={() => trackFieldChange?.('drugImage')}
+                  className="hidden"
+                />
+              </label>
+            </div>
             <p className="text-xs text-purple-600 font-medium mt-1">
               💊 Take a picture of your drugs/medicines
             </p>
-            {formData.drugImage.length > 0 && (
-              <p className="text-sm text-muted-foreground mt-2">
-                Selected: {formData.drugImage.length} file(s)
-              </p>
-            )}
           </div>
         </div>
 

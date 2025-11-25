@@ -430,43 +430,44 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
         <div>
           <Label htmlFor="assetPictures">Asset Pictures * (Minimum 3 required)</Label>
           <div className="mt-2">
-            <Input
-              id="assetPictures"
-              type="file"
-              accept="image/*"
-              capture="environment"
-              multiple
-              onChange={(e) => updateFormData({ assetPictures: Array.from(e.target.files || []) })}
-              onFocus={() => trackFieldChange?.('assetPictures')}
-              className="cursor-pointer"
-            />
+            <div className="flex flex-wrap gap-3">
+              {formData.assetPictures.map((file, index) => (
+                <div key={index} className="relative w-16 h-16 group">
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt={`Asset ${index + 1}`}
+                    className="w-full h-full object-cover rounded-lg border-2 border-gray-200 shadow-sm"
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded-lg transition-all duration-200"></div>
+                </div>
+              ))}
+              <label className="w-16 h-16 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-primary hover:bg-gray-50 transition-all duration-200 shadow-sm">
+                <span className="text-2xl text-gray-400 font-light">+</span>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  multiple
+                  onChange={(e) => {
+                    const newFiles = Array.from(e.target.files || []);
+                    updateFormData({ assetPictures: [...formData.assetPictures, ...newFiles] });
+                  }}
+                  onFocus={() => trackFieldChange?.('assetPictures')}
+                  className="hidden"
+                />
+              </label>
+            </div>
             <p className="text-xs text-orange-600 font-medium mt-1">
               📸 Take a picture of your 3 most valuable assets
             </p>
-            {formData.assetPictures.length > 0 && (
-              <>
-                <p className={`text-sm mt-2 ${
-                  formData.assetPictures.length >= 3 
-                    ? 'text-green-600' 
-                    : 'text-amber-600'
-                }`}>
-                  {formData.assetPictures.length} file(s) selected
-                  {formData.assetPictures.length < 3 && ` (${3 - formData.assetPictures.length} more needed)`}
-                </p>
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 mt-3">
-                  {formData.assetPictures.map((file, index) => (
-                    <div key={index} className="relative">
-                      <img
-                        src={URL.createObjectURL(file)}
-                        alt={`Asset ${index + 1}`}
-                        className="w-full h-16 object-cover rounded border"
-                      />
-                      <p className="text-xs text-center mt-1 truncate">{file.name}</p>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
+            <p className={`text-sm mt-1 ${
+              formData.assetPictures.length >= 3 
+                ? 'text-green-600' 
+                : 'text-amber-600'
+            }`}>
+              {formData.assetPictures.length} file(s) selected
+              {formData.assetPictures.length < 3 && ` (${3 - formData.assetPictures.length} more needed)`}
+            </p>
           </div>
         </div>
 

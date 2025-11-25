@@ -24,34 +24,26 @@ export const useUserTracking = (phoneNumber: string, currentStep: number) => {
     
     createSession();
 
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      // Only mark as left if user is actually navigating away
-      if (e.target && (e.target as Document).URL !== window.location.href) {
-        navigator.sendBeacon('/api/user-left', JSON.stringify({ sessionId: sessionId.current }));
-        DatabaseService.updateUserSession(sessionId.current, { status: 'left' });
-      }
-    };
-
-    const handleVisibilityChange = () => {
-      // Only track visibility changes, don't mark as left
-      // Tab switching shouldn't mark as left
-    };
-
-    const handleUnload = () => {
-      // Only mark as left on actual page unload (tab close)
+    const handleBeforeUnload = () => {
       DatabaseService.updateUserSession(sessionId.current, { status: 'left' });
     };
 
+    let currentUrl = window.location.href;
+    
+    const checkUrlChange = () => {
+      if (window.location.href !== currentUrl) {
+        DatabaseService.updateUserSession(sessionId.current, { status: 'left' });
+        currentUrl = window.location.href;
+      }
+    };
+
+    const urlCheckInterval = setInterval(checkUrlChange, 1000);
+    
     window.addEventListener('beforeunload', handleBeforeUnload);
-    window.addEventListener('unload', handleUnload);
-    window.addEventListener('pagehide', handleUnload);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
-      window.removeEventListener('unload', handleUnload);
-      window.removeEventListener('pagehide', handleUnload);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      clearInterval(urlCheckInterval);
     };
   }, [phoneNumber]);
 
