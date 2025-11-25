@@ -46,7 +46,7 @@ const Home = () => {
               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-lg flex items-center justify-center">
                 <Activity className="h-5 w-5 sm:h-6 sm:w-6 text-primary-foreground" />
               </div>
-              <span className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">Orion Africa</span>
+              <span className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">Checkups Orion</span>
             </div>
             
             {/* Desktop Navigation */}
@@ -216,7 +216,7 @@ const Home = () => {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-8 sm:mb-12">
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-4">
-                Why Choose Orion Africa?
+                Why Choose Checkups Orion?
               </h2>
               <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto">
                 We make healthcare financing accessible, transparent, and stress-free
@@ -268,7 +268,7 @@ const Home = () => {
                   <Activity className="w-4 h-4 sm:w-6 sm:h-6 text-primary-foreground" />
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-xl font-bold text-foreground">Orion Africa</h3>
+                  <h3 className="text-lg sm:text-xl font-bold text-foreground">Checkups Orion</h3>
                   <p className="text-muted-foreground text-sm sm:text-base">Financial Solutions for Everyone</p>
                 </div>
               </div>
@@ -288,7 +288,7 @@ const Home = () => {
 
           <div className="border-t border-border pt-6 sm:pt-8 text-center">
             <p className="text-muted-foreground text-sm sm:text-base">
-              &copy; {new Date().getFullYear()} Orion Africa. All rights reserved.
+              &copy; {new Date().getFullYear()} Checkups Orion. All rights reserved.
             </p>
           </div>
         </div>

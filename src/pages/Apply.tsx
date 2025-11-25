@@ -73,7 +73,7 @@ const Apply = () => {
         <div className="text-center space-y-2 mb-6 sm:mb-8">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2">
             <Activity className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary">Orion Africa</h1>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary">Checkups Orion</h1>
           </div>
           <p className="text-muted-foreground text-base sm:text-lg">Credit Application Form</p>
         </div>
