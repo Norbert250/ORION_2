@@ -20,7 +20,7 @@ const Home = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const [showSectorModal, setShowSectorModal] = useState(false);
+  const [showSectorModal, setShowSectorModal] = useState(true);
   const [selectedSector, setSelectedSector] = useState<'formal' | 'informal' | null>(null);
   const [selectedWorkType, setSelectedWorkType] = useState('');
 
@@ -354,12 +354,15 @@ const Home = () => {
 
             <div className="flex gap-3">
               <Button
-                variant="ghost"
-                className="flex-1"
-                onClick={() => setShowSectorModal(false)}
-              >
-                Cancel
-              </Button>
+  variant="ghost"
+  className="flex-1"
+  onClick={() => {
+    window.location.href = "https://checkupsmed.com";
+  }}
+>
+  Cancel
+</Button>
+
               <Button
                 className="flex-1"
                 disabled={!selectedSector}
