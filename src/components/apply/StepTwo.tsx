@@ -20,6 +20,7 @@ interface StepTwoProps {
 
 export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFieldChange }: StepTwoProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState('');
   
   // Calculate real-time scores from API responses
   const medicalScore = formData?.medicalScore?.scoring?.total_score || 
@@ -32,8 +33,7 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
   
   console.log('Final scores:', { medicalScore, assetScore, behaviorScore });
   
-  const overallScore = (medicalScore || assetScore || behaviorScore) ? 
-    Math.round(((medicalScore || 0) + (assetScore || 0) + (behaviorScore || 0)) / 3) : 0;
+  const overallScore = Math.round(((medicalScore || 0) + (assetScore || 0) + (behaviorScore || 0)) / 3);
 
   const analyzeFiles = async (files: File[], endpoint: string, retries = 3) => {
     if (!navigator.onLine) throw new Error('No internet connection');
@@ -109,95 +109,10 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
     }
   };
 
-  const handleNext = async () => {
+  const handleNext = () => {
     if (formData.sex && formData.age) {
-      setIsLoading(true);
-      trackFieldChange?.('stepTwo_api_processing');
-      try {
-        let prescriptionResult = null;
-        let drugResult = null;
-        let medicalNeedsResult = null;
-        let scoringResult = { score: 0 };
-        
-        if (formData.medicalPrescription.length > 0 && formData.drugImage.length > 0) {
-          // 1. Analyze prescriptions
-          console.log('Step 1: Analyzing prescriptions...');
-          prescriptionResult = await analyzeFiles(formData.medicalPrescription, '/prescriptions/analyze');
-          
-          // 2. Analyze drug images
-          console.log('Step 2: Analyzing drug images...');
-          drugResult = await analyzeFiles(formData.drugImage, '/drugs/analyze');
-          
-          // 3. Collect all drug names from all files
-          const allPrescriptionDrugs = prescriptionResult.files?.flatMap((file: any) => file.drugs || []) || [];
-          const allDrugImageDrugs = drugResult.files?.flatMap((file: any) => file.drugs || []) || [];
-          
-          const allDrugNames = [
-            ...allPrescriptionDrugs.map((drug: any) => drug.name || drug.drug_name),
-            ...allDrugImageDrugs.map((drug: any) => drug.name || drug.drug_name)
-          ].filter(Boolean);
-          
-          console.log('Step 3: Collected drug names:', allDrugNames);
-          
-          // 4. Predict medical needs (with fallback)
-          console.log('Step 4: Predicting medical needs...');
-          
-          try {
-            medicalNeedsResult = await predictMedicalNeeds(allDrugNames);
-          } catch (error) {
-            console.warn('Medical needs API unavailable, using fallback data:', error);
-            
-            // Generate fallback medical conditions based on drug names
-            const fallbackConditions = [];
-            if (allDrugNames.some(drug => drug.toLowerCase().includes('tylenol') || drug.toLowerCase().includes('acetaminophen'))) {
-              fallbackConditions.push('Pain Management', 'Fever');
-            }
-            if (allDrugNames.some(drug => drug.toLowerCase().includes('iron') || drug.toLowerCase().includes('fe'))) {
-              fallbackConditions.push('Anemia', 'Iron Deficiency');
-            }
-            if (allDrugNames.some(drug => drug.toLowerCase().includes('pantoprazole'))) {
-              fallbackConditions.push('GERD', 'Acid Reflux');
-            }
-            if (allDrugNames.some(drug => drug.toLowerCase().includes('diphenhydramine'))) {
-              fallbackConditions.push('Allergies', 'Sleep Aid');
-            }
-            
-            medicalNeedsResult = { 
-              medical_conditions: fallbackConditions.length > 0 ? fallbackConditions : ['General Health Maintenance'],
-              confidence: 0.7,
-              source: 'fallback'
-            };
-          }
-          
-          // 5. Score medical conditions (always call the real API)
-          console.log('Step 5: Scoring medical conditions...');
-          scoringResult = await scoreMedical(medicalNeedsResult.medical_conditions || []);
-        } else {
-          scoringResult = { score: 0 };
-        }
-        
-        // Store results in form data
-        console.log('Final results:', {
-          prescriptionAnalysis: prescriptionResult,
-          drugAnalysis: drugResult,
-          medicalNeeds: medicalNeedsResult,
-          medicalScore: scoringResult
-        });
-        
-        updateFormData({
-          prescriptionAnalysis: prescriptionResult,
-          drugAnalysis: drugResult,
-          medicalNeeds: medicalNeedsResult,
-          medicalScore: scoringResult
-        });
-        
-        nextStep();
-      } catch (error) {
-        console.error('API chain error:', error);
-        alert('Failed to process medical information. Please try again.');
-      } finally {
-        setIsLoading(false);
-      }
+      trackFieldChange?.('stepTwo_completed');
+      nextStep();
     } else {
       alert("Please fill in sex and age");
     }
@@ -205,72 +120,27 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
 
   return (
     <Card className="p-6 md:p-8">
-      <div className="mb-6">
-        <div className="flex items-center gap-4">
-          <div className="flex-1 h-5 bg-gray-200 rounded-full overflow-hidden relative">
-            <div className="h-full flex">
-              <div className="w-1/3 h-full bg-red-100 relative overflow-hidden">
-                <div 
-                  className="h-full bg-red-400 transition-all duration-500"
-                  style={{ width: `${medicalScore}%` }}
-                ></div>
-                <div className="absolute inset-0 flex items-center justify-center text-xs">
-                  <span className={`${medicalScore > 50 ? 'font-bold text-white' : 'text-gray-600'}`}>
-                    Medical: {medicalScore || '--'}%
-                  </span>
-                </div>
-              </div>
-              <div className="w-1/3 h-full bg-amber-100 relative overflow-hidden">
-                <div 
-                  className="h-full bg-amber-400 transition-all duration-500"
-                  style={{ width: `${assetScore}%` }}
-                ></div>
-                <div className="absolute inset-0 flex items-center justify-center text-xs">
-                  <span className={`${assetScore > 50 ? 'font-bold text-white' : 'text-gray-600'}`}>
-                    Assets: {assetScore || '--'}%
-                  </span>
-                </div>
-              </div>
-              <div className="w-1/3 h-full bg-green-100 relative overflow-hidden">
-                <div 
-                  className="h-full bg-green-400 transition-all duration-500"
-                  style={{ width: `${behaviorScore}%` }}
-                ></div>
-                <div className="absolute inset-0 flex items-center justify-center text-xs">
-                  <span className={`${behaviorScore > 50 ? 'font-bold text-white' : 'text-gray-600'}`}>
-                    Behavior: {behaviorScore || '--'}%
-                  </span>
+      {/* Score Section */}
+      <Card className="mb-6 p-6 bg-gradient-to-br from-primary to-accent border-0 shadow-lg">
+        <div className="flex justify-center">
+          <div className="relative">
+            <div className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center">
+              <div className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full border-8 border-white/20 flex flex-col items-center justify-center relative overflow-hidden">
+                <div className="absolute inset-0 rounded-full" style={{
+                  background: `conic-gradient(from 0deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.8) ${overallScore}%, rgba(255,255,255,0.1) ${overallScore}%, rgba(255,255,255,0.1) 100%)`
+                }}></div>
+                <div className="relative z-10 text-center">
+                  <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-1">{overallScore}</div>
+                  <div className="text-xs sm:text-sm font-semibold text-white/90 tracking-wider">
+                    {overallScore >= 80 ? 'EXCELLENT' : overallScore >= 60 ? 'GOOD' : 'POOR'}
+                  </div>
+                  <div className="text-xs text-white/70 mt-1">CREDIT TIER</div>
                 </div>
               </div>
             </div>
           </div>
-          <div className="relative">
-            <CircularProgress
-              value={overallScore}
-              max={100}
-              size={60}
-              strokeWidth={6}
-              color="hsl(var(--primary))"
-              backgroundColor="hsl(var(--muted))"
-            >
-              <div className="text-center">
-                <div className="text-sm font-bold">{overallScore}</div>
-              </div>
-            </CircularProgress>
-            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 60 60">
-              <defs>
-                <path id="circle-path" d="M 30,30 m -18,0 a 18,18 0 1,1 36,0 a 18,18 0 1,1 -36,0" />
-              </defs>
-              <text className="text-[7px] fill-gray-600">
-                <textPath href="#circle-path">
-                  <animate attributeName="startOffset" values="0%;100%;0%" dur="8s" repeatCount="indefinite" />
-                  Overall Score
-                </textPath>
-              </text>
-            </svg>
-          </div>
         </div>
-      </div>
+      </Card>
 
       <h2 className="text-2xl font-bold text-foreground mb-6">Personal & Medical Information</h2>
       
@@ -331,9 +201,34 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
                   accept="image/*"
                   capture="environment"
                   multiple
-                  onChange={(e) => {
+                  onChange={async (e) => {
                     const newFiles = Array.from(e.target.files || []);
-                    updateFormData({ medicalPrescription: [...formData.medicalPrescription, ...newFiles] });
+                    const allFiles = [...formData.medicalPrescription, ...newFiles];
+                    updateFormData({ medicalPrescription: allFiles });
+                    
+                    if (allFiles.length > 0) {
+                      try {
+                        setIsLoading(true);
+                        setLoadingMessage('Analyzing prescriptions...');
+                        console.log('🔄 Starting prescription analysis...');
+                        const prescriptionResult = await analyzeFiles(allFiles, '/prescriptions/analyze');
+                        console.log('✅ Prescription analysis complete:', prescriptionResult);
+                        
+                        // Add 3 points to current medical score
+                        const currentMedicalScore = formData?.medicalScore?.scoring?.total_score || formData?.medicalScore?.score || 0;
+                        const bonusScore = { score: currentMedicalScore + 3, scoring: { total_score: currentMedicalScore + 3 } };
+                        
+                        updateFormData({ 
+                          prescriptionAnalysis: prescriptionResult,
+                          medicalScore: bonusScore
+                        });
+                      } catch (error) {
+                        console.error('❌ Prescription analysis error:', error);
+                      } finally {
+                        setIsLoading(false);
+                        setLoadingMessage('');
+                      }
+                    }
                   }}
                   onFocus={() => trackFieldChange?.('medicalPrescription')}
                   className="hidden"
@@ -367,11 +262,39 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
                   accept="image/*"
                   capture="environment"
                   multiple
-                  onChange={(e) => {
+                  onChange={async (e) => {
                     const newFiles = Array.from(e.target.files || []);
-                    updateFormData({ drugImage: [...formData.drugImage, ...newFiles] });
+                    const allFiles = [...formData.drugImage, ...newFiles];
+                    updateFormData({ drugImage: allFiles });
+                    
+                    if (allFiles.length > 0) {
+                      try {
+                        setIsLoading(true);
+                        setLoadingMessage('Analyzing drugs...');
+                        console.log('🔄 Starting drug analysis for all files...');
+                        const medicalNeedsResult = await analyzeFiles(allFiles, '/medical_needs/predict');
+                        console.log('✅ Drug analysis complete:', medicalNeedsResult);
+                        
+                        if (medicalNeedsResult.predicted_conditions && formData.age) {
+                          setLoadingMessage('Scoring medical conditions...');
+                          console.log('🔄 Starting medical scoring...');
+                          const medicalScore = await scoreMedical(medicalNeedsResult.predicted_conditions);
+                          console.log('✅ Medical scoring complete:', medicalScore);
+                          updateFormData({ 
+                            medicalAnalysis: medicalNeedsResult, 
+                            medicalScore 
+                          });
+                        } else {
+                          updateFormData({ medicalAnalysis: medicalNeedsResult });
+                        }
+                      } catch (error) {
+                        console.error('❌ Drug analysis error:', error);
+                      } finally {
+                        setIsLoading(false);
+                        setLoadingMessage('');
+                      }
+                    }
                   }}
-                  onFocus={() => trackFieldChange?.('drugImage')}
                   className="hidden"
                 />
               </label>
@@ -401,7 +324,7 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Uploading...
+                {loadingMessage}
               </>
             ) : (
               <>

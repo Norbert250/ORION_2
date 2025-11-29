@@ -11,6 +11,7 @@ import UserTracker from "./pages/UserTracker";
 import Auth from "./pages/Auth";
 import LoanHistory from "./pages/LoanHistory";
 import NotFound from "./pages/NotFound";
+import DesignSystemDemo from "./pages/DesignSystemDemo";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/tracker" element={<UserTracker />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/loan-history" element={<LoanHistory />} />
+          <Route path="/design-demo" element={<DesignSystemDemo />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

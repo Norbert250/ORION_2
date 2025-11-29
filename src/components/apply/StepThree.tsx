@@ -20,6 +20,7 @@ interface StepThreeProps {
 
 export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackFieldChange }: StepThreeProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState('');
 
   
   // Calculate real-time scores from API responses
@@ -29,8 +30,7 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
   const behaviorScore = formData?.callLogsAnalysis?.credit_score || 
                        formData?.callLogsAnalysis?.score || 0;
   
-  const overallScore = (medicalScore || assetScore || behaviorScore) ? 
-    Math.round(((medicalScore || 0) + (assetScore || 0) + (behaviorScore || 0)) / 3) : 0;
+  const overallScore = Math.round(((medicalScore || 0) + (assetScore || 0) + (behaviorScore || 0)) / 3);
 
   const analyzeGPS = async (files: File[]) => {
     const formData = new FormData();
@@ -293,69 +293,12 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
     return result;
   };
 
-  const handleNext = async () => {
+  const handleNext = () => {
     const businessRequirements = !formData.hasBusiness || (formData.businessPhoto && formData.tinNumber);
     
     if (businessRequirements) {
-      setIsLoading(true);
-      trackFieldChange?.('stepThree_api_processing');
-      try {
-        let assetAnalysis = null;
-        let bankAnalysis = null;
-        let mpesaAnalysis = null;
-        let bankScore = { bank_statement_credit_score: 0 };
-        let creditEvaluation = { credit_score: 0 };
-        
-        const allFiles = [...formData.assetPictures];
-        if (formData.homePhoto) {
-          allFiles.push(formData.homePhoto);
-        }
-        if (formData.hasBusiness && formData.businessPhoto) {
-          allFiles.push(formData.businessPhoto);
-        }
-        
-        if (allFiles.length > 0) {
-          console.log('Step 1: Analyzing assets...');
-          assetAnalysis = await analyzeAssets(allFiles);
-          
-          console.log('Step 2: Evaluating credit...');
-          creditEvaluation = await evaluateCredit(assetAnalysis, null);
-        } else {
-          creditEvaluation = { credit_score: 0 };
-        }
-        
-        if (formData.bankStatement) {
-          console.log('Step 3: Analyzing bank statement...');
-          bankAnalysis = await analyzeBankStatement(formData.bankStatement, formData.bankPassword);
-          
-          console.log('Step 5: Scoring bank statement...');
-          bankScore = await scoreBankStatement(bankAnalysis);
-        } else {
-          bankScore = { bank_statement_credit_score: 0 };
-        }
-        
-        if (formData.mpesaStatement) {
-          console.log('Step 4: Analyzing M-Pesa statement...');
-          mpesaAnalysis = await analyzeMpesaStatement(formData.mpesaStatement, formData.mpesaPassword);
-        } else {
-          mpesaAnalysis = { score: 0 };
-        }
-        
-        updateFormData({
-          assetAnalysis: assetAnalysis,
-          bankAnalysis: bankAnalysis,
-          mpesaAnalysis: mpesaAnalysis,
-          bankScore: bankScore,
-          creditEvaluation: creditEvaluation
-        });
-        
-        nextStep();
-      } catch (error) {
-        console.error('Analysis error:', error);
-        alert('Failed to analyze data. Please try again.');
-      } finally {
-        setIsLoading(false);
-      }
+      trackFieldChange?.('stepThree_completed');
+      nextStep();
     } else {
       alert("Please complete business information if applicable");
     }
@@ -363,72 +306,27 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
 
   return (
     <Card className="p-6 md:p-8">
-      <div className="mb-6">
-        <div className="flex items-center gap-4">
-          <div className="flex-1 h-5 bg-gray-200 rounded-full overflow-hidden relative">
-            <div className="h-full flex">
-              <div className="w-1/3 h-full bg-red-100 relative overflow-hidden">
-                <div 
-                  className="h-full bg-red-400 transition-all duration-500"
-                  style={{ width: `${medicalScore}%` }}
-                ></div>
-                <div className="absolute inset-0 flex items-center justify-center text-xs">
-                  <span className={`${medicalScore > 50 ? 'font-bold text-white' : 'text-gray-600'}`}>
-                    Medical: {medicalScore || '--'}%
-                  </span>
-                </div>
-              </div>
-              <div className="w-1/3 h-full bg-amber-100 relative overflow-hidden">
-                <div 
-                  className="h-full bg-amber-400 transition-all duration-500"
-                  style={{ width: `${assetScore}%` }}
-                ></div>
-                <div className="absolute inset-0 flex items-center justify-center text-xs">
-                  <span className={`${assetScore > 50 ? 'font-bold text-white' : 'text-gray-600'}`}>
-                    Assets: {assetScore || '--'}%
-                  </span>
-                </div>
-              </div>
-              <div className="w-1/3 h-full bg-green-100 relative overflow-hidden">
-                <div 
-                  className="h-full bg-green-400 transition-all duration-500"
-                  style={{ width: `${behaviorScore}%` }}
-                ></div>
-                <div className="absolute inset-0 flex items-center justify-center text-xs">
-                  <span className={`${behaviorScore > 50 ? 'font-bold text-white' : 'text-gray-600'}`}>
-                    Behavior: {behaviorScore || '--'}%
-                  </span>
+      {/* Score Section */}
+      <Card className="mb-6 p-6 bg-gradient-to-br from-primary to-accent border-0 shadow-lg">
+        <div className="flex justify-center">
+          <div className="relative">
+            <div className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center">
+              <div className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full border-8 border-white/20 flex flex-col items-center justify-center relative overflow-hidden">
+                <div className="absolute inset-0 rounded-full" style={{
+                  background: `conic-gradient(from 0deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.8) ${overallScore}%, rgba(255,255,255,0.1) ${overallScore}%, rgba(255,255,255,0.1) 100%)`
+                }}></div>
+                <div className="relative z-10 text-center">
+                  <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-1">{overallScore}</div>
+                  <div className="text-xs sm:text-sm font-semibold text-white/90 tracking-wider">
+                    {overallScore >= 80 ? 'EXCELLENT' : overallScore >= 60 ? 'GOOD' : 'POOR'}
+                  </div>
+                  <div className="text-xs text-white/70 mt-1">CREDIT TIER</div>
                 </div>
               </div>
             </div>
           </div>
-          <div className="relative">
-            <CircularProgress
-              value={overallScore}
-              max={100}
-              size={60}
-              strokeWidth={6}
-              color="hsl(var(--primary))"
-              backgroundColor="hsl(var(--muted))"
-            >
-              <div className="text-center">
-                <div className="text-sm font-bold">{overallScore}</div>
-              </div>
-            </CircularProgress>
-            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 60 60">
-              <defs>
-                <path id="circle-path-step3" d="M 30,30 m -18,0 a 18,18 0 1,1 36,0 a 18,18 0 1,1 -36,0" />
-              </defs>
-              <text className="text-[7px] fill-gray-600">
-                <textPath href="#circle-path-step3">
-                  <animate attributeName="startOffset" values="0%;100%;0%" dur="8s" repeatCount="indefinite" />
-                  Overall Score
-                </textPath>
-              </text>
-            </svg>
-          </div>
         </div>
-      </div>
+      </Card>
 
       <h2 className="text-2xl font-bold text-foreground mb-6">Asset Information</h2>
       
@@ -454,9 +352,31 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
                   accept="image/*"
                   capture="environment"
                   multiple
-                  onChange={(e) => {
+                  onChange={async (e) => {
                     const newFiles = Array.from(e.target.files || []);
-                    updateFormData({ assetPictures: [...formData.assetPictures, ...newFiles] });
+                    const allFiles = [...formData.assetPictures, ...newFiles];
+                    updateFormData({ assetPictures: allFiles });
+                    
+                    if (allFiles.length > 0) {
+                      try {
+                        setIsLoading(true);
+                        setLoadingMessage('Analyzing assets...');
+                        console.log('🔄 Starting asset analysis...');
+                        const assetAnalysis = await analyzeAssets([...allFiles, ...(formData.homePhoto ? [formData.homePhoto] : []), ...(formData.businessPhoto ? [formData.businessPhoto] : [])]);
+                        console.log('✅ Asset analysis complete:', assetAnalysis);
+                        
+                        console.log('🔄 Starting credit evaluation...');
+                        const creditEvaluation = await evaluateCredit(assetAnalysis, null);
+                        console.log('✅ Credit evaluation complete:', creditEvaluation);
+                        
+                        updateFormData({ assetAnalysis, creditEvaluation });
+                      } catch (error) {
+                        console.error('❌ Asset analysis error:', error);
+                      } finally {
+                        setIsLoading(false);
+                        setLoadingMessage('');
+                      }
+                    }
                   }}
                   onFocus={() => trackFieldChange?.('assetPictures')}
                   className="hidden"
@@ -485,7 +405,38 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
                 id="bankStatement"
                 type="file"
                 accept=".pdf,image/*"
-                onChange={(e) => updateFormData({ bankStatement: e.target.files?.[0] || null })}
+                onChange={async (e) => {
+                  const file = e.target.files?.[0] || null;
+                  updateFormData({ bankStatement: file });
+                  
+                  if (file) {
+                    try {
+                      setIsLoading(true);
+                      setLoadingMessage('Analyzing bank statement...');
+                      console.log('🔄 Starting bank statement analysis...');
+                      const bankAnalysis = await analyzeBankStatement(file, formData.bankPassword);
+                      console.log('✅ Bank statement analysis complete:', bankAnalysis);
+                      
+                      const bankScore = await scoreBankStatement(bankAnalysis);
+                      console.log('✅ Bank statement scoring complete:', bankScore);
+                      
+                      // Add 3 points to current asset score
+                      const currentAssetScore = formData?.creditEvaluation?.credit_score || 0;
+                      const bonusScore = { credit_score: currentAssetScore + 3 };
+                      
+                      updateFormData({ 
+                        bankAnalysis, 
+                        bankScore, 
+                        creditEvaluation: bonusScore 
+                      });
+                    } catch (error) {
+                      console.error('❌ Bank statement analysis error:', error);
+                    } finally {
+                      setIsLoading(false);
+                      setLoadingMessage('');
+                    }
+                  }
+                }}
                 onFocus={() => trackFieldChange?.('bankStatement')}
                 className="cursor-pointer"
               />
@@ -515,7 +466,34 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
                 id="mpesaStatement"
                 type="file"
                 accept=".pdf,image/*"
-                onChange={(e) => updateFormData({ mpesaStatement: e.target.files?.[0] || null })}
+                onChange={async (e) => {
+                  const file = e.target.files?.[0] || null;
+                  updateFormData({ mpesaStatement: file });
+                  
+                  if (file) {
+                    try {
+                      setIsLoading(true);
+                      setLoadingMessage('Analyzing M-Pesa statement...');
+                      console.log('🔄 Starting M-Pesa analysis...');
+                      const mpesaAnalysis = await analyzeMpesaStatement(file, formData.mpesaPassword);
+                      console.log('✅ M-Pesa analysis complete:', mpesaAnalysis);
+                      
+                      // Add 3 points to current asset score
+                      const currentAssetScore = formData?.creditEvaluation?.credit_score || 0;
+                      const bonusScore = { credit_score: currentAssetScore + 3 };
+                      
+                      updateFormData({ 
+                        mpesaAnalysis, 
+                        creditEvaluation: bonusScore 
+                      });
+                    } catch (error) {
+                      console.error('❌ M-Pesa analysis error:', error);
+                    } finally {
+                      setIsLoading(false);
+                      setLoadingMessage('');
+                    }
+                  }
+                }}
                 onFocus={() => trackFieldChange?.('mpesaStatement')}
                 className="cursor-pointer"
               />
@@ -630,7 +608,7 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Analyzing Assets...
+                {loadingMessage}
               </>
             ) : (
               <>

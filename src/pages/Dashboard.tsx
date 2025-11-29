@@ -42,10 +42,10 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
   };
   
   const getCreditLimit = (score: number) => {
-    if (score >= 80) return 'KSh 2,500,000';
-    if (score >= 70) return 'KSh 1,500,000';
-    if (score >= 60) return 'KSh 1,000,000';
-    return 'KSh 500,000';
+    const drugAmount = formData?.medicalAnalysis?.total_amount || 0;
+    const prescriptionAmount = formData?.medicalScore?.total_amount || 0;
+    const totalAmount = drugAmount + prescriptionAmount;
+    return totalAmount > 0 ? `KSh ${totalAmount.toLocaleString()}` : 'KSh 0';
   };
   
   const getAPR = (score: number) => {
@@ -58,19 +58,19 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
   // Tier functions based on scores
   const getMedicalTier = (score: number) => {
     if (score >= 80) return { color: 'hsl(var(--health-green))', badge: 'bg-green-100 text-green-800', text: 'Low Need' };
-    if (score >= 60) return { color: 'hsl(var(--health-yellow))', badge: 'bg-amber-100 text-amber-800', text: 'Medium Need' };
+    if (score >= 60) return { color: 'hsl(var(--health-yellow))', badge: 'bg-yellow-100 text-yellow-800', text: 'Medium Need' };
     return { color: 'hsl(var(--health-red))', badge: 'bg-red-100 text-red-800', text: 'High Need' };
   };
   
   const getAssetTier = (score: number) => {
     if (score >= 80) return { color: 'hsl(var(--health-green))', badge: 'bg-green-100 text-green-800', text: 'Excellent Assets' };
-    if (score >= 60) return { color: 'hsl(var(--health-yellow))', badge: 'bg-amber-100 text-amber-800', text: 'Strong Assets' };
+    if (score >= 60) return { color: 'hsl(var(--health-yellow))', badge: 'bg-yellow-100 text-yellow-800', text: 'Strong Assets' };
     return { color: 'hsl(var(--health-red))', badge: 'bg-red-100 text-red-800', text: 'Limited Assets' };
   };
   
   const getBehaviorTier = (score: number) => {
     if (score >= 80) return { color: 'hsl(var(--health-green))', badge: 'bg-green-100 text-green-800', text: 'Excellent Behavior' };
-    if (score >= 60) return { color: 'hsl(var(--health-yellow))', badge: 'bg-amber-100 text-amber-800', text: 'Good Behavior' };
+    if (score >= 60) return { color: 'hsl(var(--health-yellow))', badge: 'bg-yellow-100 text-yellow-800', text: 'Good Behavior' };
     return { color: 'hsl(var(--health-red))', badge: 'bg-red-100 text-red-800', text: 'Poor Behavior' };
   };
   
@@ -91,7 +91,7 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
         </div>
 
         {/* Composite Credit Score */}
-        <Card className="p-4 sm:p-6 md:p-8 lg:p-12 bg-gradient-to-br from-[hsl(250,60%,60%)] to-[hsl(270,50%,50%)] border-none">
+        <Card className="p-4 sm:p-6 md:p-8 lg:p-12 bg-gradient-to-br from-primary to-accent border-none shadow-lg">
           <div className="text-center space-y-4 sm:space-y-6">
             <h2 className="text-white text-lg sm:text-xl md:text-2xl font-semibold tracking-wide">COMPOSITE CREDIT SCORE</h2>
             

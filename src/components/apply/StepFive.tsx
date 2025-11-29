@@ -5,6 +5,7 @@ import { ApplicationFormData } from "@/types/form";
 import { ArrowLeft, CheckCircle2, Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { DatabaseService } from "@/lib/database";
+import { GradientCircularProgress } from "@/components/GradientCircularProgress";
 
 interface StepFiveProps {
   formData: ApplicationFormData;
@@ -87,30 +88,45 @@ export const StepFive = ({ formData, prevStep, handleSubmit }: StepFiveProps) =>
 
   return (
     <Card className="p-4 sm:p-6 md:p-8">
-      <div className="mb-6">
-        <div className="flex justify-between text-sm mb-2">
-          <span className={medicalScore ? 'text-orange-600 font-semibold' : 'text-gray-400'}>Medical: {medicalScore || '--'}%</span>
-          <span className={assetScore ? 'text-yellow-600 font-semibold' : 'text-gray-400'}>Assets: {assetScore || '--'}%</span>
-          <span className={behaviorScore ? 'text-green-600 font-semibold' : 'text-gray-400'}>Behavior: {behaviorScore || '--'}%</span>
-        </div>
-        <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
-          <div className="h-full flex">
-            <div 
-              className={`transition-all duration-500 ${medicalScore ? 'bg-orange-500' : 'bg-gray-300'}`}
-              style={{ width: `${medicalScore ? (medicalScore / 3) : 33.33}%` }}
-            ></div>
-            <div 
-              className={`transition-all duration-500 ${assetScore ? 'bg-yellow-500' : 'bg-gray-300'}`}
-              style={{ width: `${assetScore ? (assetScore / 3) : 33.33}%` }}
-            ></div>
-            <div 
-              className={`transition-all duration-500 ${behaviorScore ? 'bg-green-500' : 'bg-gray-300'}`}
-              style={{ width: `${behaviorScore ? (behaviorScore / 3) : 33.33}%` }}
-            ></div>
+      <div className="mb-6 p-6 bg-gradient-to-br from-primary to-accent rounded-lg">
+        <div className="text-center space-y-4">
+          <h3 className="text-white text-lg font-semibold tracking-wide">COMPOSITE CREDIT SCORE</h3>
+          
+          <div className="flex justify-center">
+            <GradientCircularProgress
+              value={overallScore}
+              max={100}
+              size={140}
+              strokeWidth={12}
+              gradientId="reviewScoreGradient"
+              gradientColors={[
+                { offset: "0%", color: "hsl(45, 93%, 47%)" },
+                { offset: "60%", color: "hsl(120, 60%, 50%)" },
+                { offset: "100%", color: "hsl(158, 64%, 52%)" },
+              ]}
+              backgroundColor="rgba(255, 255, 255, 0.2)"
+            >
+              <div className="text-center">
+                <div className="text-4xl font-bold text-white">{overallScore}</div>
+                <div className="text-white/70 text-sm mt-1">/ 100</div>
+              </div>
+            </GradientCircularProgress>
           </div>
-        </div>
-        <div className="text-center mt-2">
-          <span className="text-lg font-bold">Overall Score: {overallScore || '--'}</span>
+
+          <div className="grid grid-cols-3 gap-4 text-white text-sm">
+            <div>
+              <div className="text-white/80 mb-1">Medical</div>
+              <div className="text-lg font-bold">{medicalScore || '--'}</div>
+            </div>
+            <div>
+              <div className="text-white/80 mb-1">Assets</div>
+              <div className="text-lg font-bold">{assetScore || '--'}</div>
+            </div>
+            <div>
+              <div className="text-white/80 mb-1">Behavior</div>
+              <div className="text-lg font-bold">{behaviorScore || '--'}</div>
+            </div>
+          </div>
         </div>
       </div>
 

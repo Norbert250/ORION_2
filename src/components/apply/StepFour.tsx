@@ -18,6 +18,7 @@ interface StepFourProps {
 
 export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFieldChange }: StepFourProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState('');
   
   // Calculate real-time scores from API responses
   const medicalScore = formData?.medicalScore?.scoring?.total_score || 
@@ -26,8 +27,7 @@ export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFi
   const behaviorScore = formData?.callLogsAnalysis?.credit_score || 
                        formData?.callLogsAnalysis?.score || 0;
   
-  const overallScore = (medicalScore || assetScore || behaviorScore) ? 
-    Math.round(((medicalScore || 0) + (assetScore || 0) + (behaviorScore || 0)) / 3) : 0;
+  const overallScore = Math.round(((medicalScore || 0) + (assetScore || 0) + (behaviorScore || 0)) / 3);
 
   const analyzeCallLogs = async (file: File) => {
     const formData = new FormData();
@@ -74,48 +74,10 @@ export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFi
     return result;
   };
 
-  const handleNext = async () => {
-    if (
-      formData.guarantor1Phone &&
-      formData.guarantor2Phone
-    ) {
-      setIsLoading(true);
-      trackFieldChange?.('stepFour_api_processing');
-      try {
-        let callLogsAnalysis = { credit_score: 0, score: 0 };
-        let guarantor1IdAnalysis = null;
-        let guarantor2IdAnalysis = null;
-        
-        if (formData.callLogHistory) {
-          console.log('Step 1: Analyzing call logs...');
-          callLogsAnalysis = await analyzeCallLogs(formData.callLogHistory);
-        } else {
-          callLogsAnalysis = { credit_score: 0, score: 0 };
-        }
-        
-        if (formData.guarantor1Id) {
-          console.log('Step 2: Analyzing guarantor 1 ID...');
-          guarantor1IdAnalysis = await analyzeId(formData.guarantor1Id);
-        }
-        
-        if (formData.guarantor2Id) {
-          console.log('Step 3: Analyzing guarantor 2 ID...');
-          guarantor2IdAnalysis = await analyzeId(formData.guarantor2Id);
-        }
-        
-        updateFormData({
-          callLogsAnalysis: callLogsAnalysis,
-          guarantor1IdAnalysis: guarantor1IdAnalysis,
-          guarantor2IdAnalysis: guarantor2IdAnalysis
-        });
-        
-        nextStep();
-      } catch (error) {
-        console.error('Analysis error:', error);
-        alert('Failed to analyze documents. Please try again.');
-      } finally {
-        setIsLoading(false);
-      }
+  const handleNext = () => {
+    if (formData.guarantor1Phone && formData.guarantor2Phone) {
+      trackFieldChange?.('stepFour_completed');
+      nextStep();
     } else {
       alert("Please provide guarantor phone numbers");
     }
@@ -123,72 +85,27 @@ export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFi
 
   return (
     <Card className="p-6 md:p-8">
-      <div className="mb-6">
-        <div className="flex items-center gap-4">
-          <div className="flex-1 h-5 bg-gray-200 rounded-full overflow-hidden relative">
-            <div className="h-full flex">
-              <div className="w-1/3 h-full bg-red-100 relative overflow-hidden">
-                <div 
-                  className="h-full bg-red-400 transition-all duration-500"
-                  style={{ width: `${medicalScore}%` }}
-                ></div>
-                <div className="absolute inset-0 flex items-center justify-center text-xs">
-                  <span className={`${medicalScore > 50 ? 'font-bold text-white' : 'text-gray-600'}`}>
-                    Medical: {medicalScore || '--'}%
-                  </span>
-                </div>
-              </div>
-              <div className="w-1/3 h-full bg-amber-100 relative overflow-hidden">
-                <div 
-                  className="h-full bg-amber-400 transition-all duration-500"
-                  style={{ width: `${assetScore}%` }}
-                ></div>
-                <div className="absolute inset-0 flex items-center justify-center text-xs">
-                  <span className={`${assetScore > 50 ? 'font-bold text-white' : 'text-gray-600'}`}>
-                    Assets: {assetScore || '--'}%
-                  </span>
-                </div>
-              </div>
-              <div className="w-1/3 h-full bg-green-100 relative overflow-hidden">
-                <div 
-                  className="h-full bg-green-400 transition-all duration-500"
-                  style={{ width: `${behaviorScore}%` }}
-                ></div>
-                <div className="absolute inset-0 flex items-center justify-center text-xs">
-                  <span className={`${behaviorScore > 50 ? 'font-bold text-white' : 'text-gray-600'}`}>
-                    Behavior: {behaviorScore || '--'}%
-                  </span>
+      {/* Score Section */}
+      <Card className="mb-6 p-6 bg-gradient-to-br from-primary to-accent border-0 shadow-lg">
+        <div className="flex justify-center">
+          <div className="relative">
+            <div className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center">
+              <div className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full border-8 border-white/20 flex flex-col items-center justify-center relative overflow-hidden">
+                <div className="absolute inset-0 rounded-full" style={{
+                  background: `conic-gradient(from 0deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.8) ${overallScore}%, rgba(255,255,255,0.1) ${overallScore}%, rgba(255,255,255,0.1) 100%)`
+                }}></div>
+                <div className="relative z-10 text-center">
+                  <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-1">{overallScore}</div>
+                  <div className="text-xs sm:text-sm font-semibold text-white/90 tracking-wider">
+                    {overallScore >= 80 ? 'EXCELLENT' : overallScore >= 60 ? 'GOOD' : 'POOR'}
+                  </div>
+                  <div className="text-xs text-white/70 mt-1">CREDIT TIER</div>
                 </div>
               </div>
             </div>
           </div>
-          <div className="relative">
-            <CircularProgress
-              value={overallScore}
-              max={100}
-              size={60}
-              strokeWidth={6}
-              color="hsl(var(--primary))"
-              backgroundColor="hsl(var(--muted))"
-            >
-              <div className="text-center">
-                <div className="text-sm font-bold">{overallScore}</div>
-              </div>
-            </CircularProgress>
-            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 60 60">
-              <defs>
-                <path id="circle-path-step4" d="M 30,30 m -18,0 a 18,18 0 1,1 36,0 a 18,18 0 1,1 -36,0" />
-              </defs>
-              <text className="text-[7px] fill-gray-600">
-                <textPath href="#circle-path-step4">
-                  <animate attributeName="startOffset" values="0%;100%;0%" dur="8s" repeatCount="indefinite" />
-                  Overall Score
-                </textPath>
-              </text>
-            </svg>
-          </div>
         </div>
-      </div>
+      </Card>
 
       <h2 className="text-2xl font-bold text-foreground mb-6">Guarantor Information</h2>
       
@@ -200,7 +117,26 @@ export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFi
               id="callLogHistory"
               type="file"
               accept=".pdf,image/*,.csv"
-              onChange={(e) => updateFormData({ callLogHistory: e.target.files?.[0] || null })}
+              onChange={async (e) => {
+                const file = e.target.files?.[0] || null;
+                updateFormData({ callLogHistory: file });
+                
+                if (file) {
+                  try {
+                    setIsLoading(true);
+                    setLoadingMessage('Analyzing call logs...');
+                    console.log('🔄 Starting call logs analysis...');
+                    const callLogsAnalysis = await analyzeCallLogs(file);
+                    console.log('✅ Call logs analysis complete:', callLogsAnalysis);
+                    updateFormData({ callLogsAnalysis });
+                  } catch (error) {
+                    console.error('❌ Call logs analysis error:', error);
+                  } finally {
+                    setIsLoading(false);
+                    setLoadingMessage('');
+                  }
+                }
+              }}
               onFocus={() => trackFieldChange?.('callLogHistory')}
               className="cursor-pointer"
             />
@@ -222,7 +158,34 @@ export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFi
                   id="guarantor1Id"
                   type="file"
                   accept="image/*,.pdf"
-                  onChange={(e) => updateFormData({ guarantor1Id: e.target.files?.[0] || null })}
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0] || null;
+                    updateFormData({ guarantor1Id: file });
+                    
+                    if (file) {
+                      try {
+                        setIsLoading(true);
+                        setLoadingMessage('Analyzing guarantor 1 ID...');
+                        console.log('🔄 Starting guarantor 1 ID analysis...');
+                        const guarantor1IdAnalysis = await analyzeId(file);
+                        console.log('✅ Guarantor 1 ID analysis complete:', guarantor1IdAnalysis);
+                        
+                        // Add 3 points to current behavior score
+                        const currentBehaviorScore = formData?.callLogsAnalysis?.credit_score || formData?.callLogsAnalysis?.score || 0;
+                        const bonusScore = { credit_score: currentBehaviorScore + 3, score: currentBehaviorScore + 3 };
+                        
+                        updateFormData({ 
+                          guarantor1IdAnalysis, 
+                          callLogsAnalysis: bonusScore 
+                        });
+                      } catch (error) {
+                        console.error('❌ Guarantor 1 ID analysis error:', error);
+                      } finally {
+                        setIsLoading(false);
+                        setLoadingMessage('');
+                      }
+                    }
+                  }}
                   onFocus={() => trackFieldChange?.('guarantor1Id')}
                   className="cursor-pointer"
                 />
@@ -266,7 +229,34 @@ export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFi
                   id="guarantor2Id"
                   type="file"
                   accept="image/*,.pdf"
-                  onChange={(e) => updateFormData({ guarantor2Id: e.target.files?.[0] || null })}
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0] || null;
+                    updateFormData({ guarantor2Id: file });
+                    
+                    if (file) {
+                      try {
+                        setIsLoading(true);
+                        setLoadingMessage('Analyzing guarantor 2 ID...');
+                        console.log('🔄 Starting guarantor 2 ID analysis...');
+                        const guarantor2IdAnalysis = await analyzeId(file);
+                        console.log('✅ Guarantor 2 ID analysis complete:', guarantor2IdAnalysis);
+                        
+                        // Add 3 points to current behavior score
+                        const currentBehaviorScore = formData?.callLogsAnalysis?.credit_score || formData?.callLogsAnalysis?.score || 0;
+                        const bonusScore = { credit_score: currentBehaviorScore + 3, score: currentBehaviorScore + 3 };
+                        
+                        updateFormData({ 
+                          guarantor2IdAnalysis, 
+                          callLogsAnalysis: bonusScore 
+                        });
+                      } catch (error) {
+                        console.error('❌ Guarantor 2 ID analysis error:', error);
+                      } finally {
+                        setIsLoading(false);
+                        setLoadingMessage('');
+                      }
+                    }
+                  }}
                   onFocus={() => trackFieldChange?.('guarantor2Id')}
                   className="cursor-pointer"
                 />
@@ -319,7 +309,7 @@ export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFi
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Analyzing Call Logs...
+                {loadingMessage}
               </>
             ) : (
               <>
