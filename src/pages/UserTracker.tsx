@@ -64,7 +64,20 @@ const UserTracker = () => {
       console.log('Starting fetchSessions...');
       const data = await DatabaseService.getUserSessions();
       console.log('Received data:', data);
-      setSessions(data);
+      
+      // Auto-update sessions that have been inactive for more than 5 minutes
+      const updatedData = data.map(session => {
+        const lastActivity = new Date(session.last_activity).getTime();
+        const now = Date.now();
+        const inactiveMinutes = (now - lastActivity) / (1000 * 60);
+        
+        if (session.status === 'inprogress' && inactiveMinutes > 10) {
+          return { ...session, status: 'left' };
+        }
+        return session;
+      });
+      
+      setSessions(updatedData);
     } catch (error) {
       console.error('Error fetching sessions:', error);
       setSessions([]);

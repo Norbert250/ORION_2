@@ -155,13 +155,21 @@ const AdminDashboard = () => {
   };
 
   const getStatusBadge = (status: string) => {
-    const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
-      pending: "outline",
-      approved: "default",
-      rejected: "destructive",
-      processing: "secondary"
+    const statusConfig = {
+      pending: { bg: 'bg-yellow-100', text: 'text-yellow-800', dot: 'bg-yellow-500', label: 'Pending' },
+      approved: { bg: 'bg-green-100', text: 'text-green-800', dot: 'bg-green-500', label: 'Approved' },
+      rejected: { bg: 'bg-red-100', text: 'text-red-800', dot: 'bg-red-500', label: 'Rejected' },
+      processing: { bg: 'bg-blue-100', text: 'text-blue-800', dot: 'bg-blue-500', label: 'Processing' }
     };
-    return <Badge variant={variants[status] || "outline"}>{status.toUpperCase()}</Badge>;
+    
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
+    
+    return (
+      <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full ${config.bg}`}>
+        <div className={`w-2 h-2 rounded-full ${config.dot}`}></div>
+        <span className={`text-sm font-medium ${config.text}`}>{config.label}</span>
+      </div>
+    );
   };
 
   const getScoreColor = (score: number) => {
@@ -323,7 +331,9 @@ const AdminDashboard = () => {
                     <TableRow key={app.id}>
                       <TableCell className="font-medium">{app.loan_id}</TableCell>
                       <TableCell>{app.user_id}</TableCell>
-                      <TableCell>{getStatusBadge(app.status)}</TableCell>
+                      <TableCell>
+                        {getStatusBadge(app.status)}
+                      </TableCell>
                       <TableCell className={getScoreColor(app.medical_score)}>{app.medical_score}%</TableCell>
                       <TableCell className={getScoreColor(app.asset_score)}>{app.asset_score}%</TableCell>
                       <TableCell className={getScoreColor(app.behavior_score)}>{app.behavior_score}%</TableCell>
