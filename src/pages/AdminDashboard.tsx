@@ -218,98 +218,118 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-              <FileText className="h-6 w-6 text-white" />
+      <div className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-4">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
+                <FileText className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">CheckupsMed</h1>
+                <p className="text-xs text-gray-500">Admin Dashboard</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-semibold text-gray-900">CheckupsMed Admin</h1>
-              <p className="text-sm text-gray-500">Credit Application Management</p>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 px-2 py-1 bg-green-50 rounded-md">
+                <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-xs font-medium text-green-700">Live</span>
+              </div>
+              <Button onClick={fetchApplications} variant="ghost" size="sm" className="text-gray-600">Refresh</Button>
             </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 px-3 py-1 bg-green-100 rounded-full">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span className="text-xs font-medium text-green-700">Live Updates</span>
-            </div>
-            <Button onClick={fetchApplications} variant="outline" size="sm">Refresh</Button>
           </div>
         </div>
       </div>
       
-      <div className="p-6 space-y-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white p-4 rounded-xl border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Applications</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
+                  <FileText className="h-4 w-4 text-white" />
+                </div>
               </div>
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <FileText className="h-5 w-5 text-blue-600" />
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white p-4 rounded-xl border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Pending Review</p>
-                <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
-              </div>
-              <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
-                <Calendar className="h-5 w-5 text-yellow-600" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">Total Applications</p>
+                <p className="text-2xl font-semibold text-gray-900">{stats.total}</p>
               </div>
             </div>
           </div>
           
-          <div className="bg-white p-4 rounded-xl border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Approved</p>
-                <p className="text-2xl font-bold text-green-600">{stats.approved}</p>
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center">
+                  <Calendar className="h-4 w-4 text-white" />
+                </div>
               </div>
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <CheckCircle className="h-5 w-5 text-green-600" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">Pending Review</p>
+                <p className="text-2xl font-semibold text-yellow-600">{stats.pending}</p>
               </div>
             </div>
           </div>
           
-          <div className="bg-white p-4 rounded-xl border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Avg Credit Score</p>
-                <p className={`text-2xl font-bold ${getScoreColor(stats.avgScore)}`}>{stats.avgScore}%</p>
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
+                  <CheckCircle className="h-4 w-4 text-white" />
+                </div>
               </div>
-              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="h-5 w-5 text-purple-600" />
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">Approved</p>
+                <p className="text-2xl font-semibold text-green-600">{stats.approved}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="w-8 h-8 bg-purple-500 rounded-md flex items-center justify-center">
+                  <TrendingUp className="h-4 w-4 text-white" />
+                </div>
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-500">Avg Credit Score</p>
+                <p className={`text-2xl font-semibold ${getScoreColor(stats.avgScore)}`}>{stats.avgScore}%</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Search */}
-        <div className="flex items-center space-x-2">
-          <Search className="h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search by Loan ID or User ID..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-sm"
-          />
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Applications</h2>
+            <p className="text-gray-600">Manage and review credit applications</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <Search className="h-4 w-4 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
+              <Input
+                placeholder="Search applications..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 w-80 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+          </div>
         </div>
 
         {/* Applications Table */}
-        <div className="bg-white rounded-xl border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Credit Applications ({filteredApplications.length})</h2>
-            <p className="text-sm text-gray-500">Review and manage loan applications</p>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900">Recent Applications</h3>
+              <span className="text-sm text-gray-500">{filteredApplications.length} total</span>
+            </div>
           </div>
-          <div className="p-6">
+          <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
