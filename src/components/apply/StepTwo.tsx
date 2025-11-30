@@ -132,6 +132,11 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
       alert("Please fill in sex and age");
     }
   };
+  const calculateAgeFromYear = (year: number) => {
+  const currentYear = new Date().getFullYear();
+  return currentYear - year;
+};
+
 
   return (
     <Card className="p-6 md:p-8">
@@ -199,20 +204,28 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
             </Select>
           </div>
 
-          <div>
-            <Label htmlFor="age">Age *</Label>
-            <Input
-              id="age"
-              type="number"
-              placeholder="Enter your age"
-              value={formData.age}
-              onChange={(e) => updateFormData({ age: e.target.value })}
-              onFocus={() => trackFieldChange?.('age')}
-              className="mt-2"
-              min="18"
-              max="120"
-            />
-          </div>
+         <div>
+  <Label htmlFor="dob">Year of Birth *</Label>
+  <Select
+    value={formData.dob}
+    onValueChange={(value) => {
+      const age = calculateAgeFromYear(parseInt(value));
+      updateFormData({ dob: value, age: age.toString() });
+    }}
+    onOpenChange={(open) => open && trackFieldChange?.("dob")}
+  >
+    <SelectTrigger className="mt-2">
+      <SelectValue placeholder="Select year of birth" />
+    </SelectTrigger>
+    <SelectContent>
+      {Array.from({ length: 90 }, (_, i) => {
+        const year = new Date().getFullYear() - i - 18; // min age 18
+        return <SelectItem key={year} value={year.toString()}>{year}</SelectItem>;
+      })}
+    </SelectContent>
+  </Select>
+</div>
+
         </div>
 
         <div>

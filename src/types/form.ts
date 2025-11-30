@@ -34,4 +34,6 @@ export interface ApplicationFormData {
   guarantor2IdAnalysis?: any;
   bankPassword?: string;
   mpesaPassword?: string;
+  medicalAnalysis?: any;
+  dob?: string;
 }
