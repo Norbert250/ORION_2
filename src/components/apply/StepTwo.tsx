@@ -269,6 +269,7 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
                   capture="environment"
                   multiple
                   onChange={async (e) => {
+                    trackFieldChange?.('drugImage');
                     const newFiles = Array.from(e.target.files || []);
                     const allFiles = [...formData.drugImage, ...newFiles];
                     updateFormData({ drugImage: allFiles });

@@ -248,6 +248,7 @@ const UserTracker = () => {
                 <TableRow>
                   <TableHead>Phone Number</TableHead>
                   <TableHead>Current Step</TableHead>
+                  <TableHead>Current Field</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Started</TableHead>
                   <TableHead>Last Activity</TableHead>
@@ -264,6 +265,9 @@ const UserTracker = () => {
                         </div>
                         <span className="font-medium">{getStepName(session.current_step)}</span>
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm text-gray-600 font-mono">{session.current_field || 'N/A'}</span>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
