@@ -121,21 +121,13 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
   return (
     <Card className="p-6 md:p-8">
       {/* Score Section */}
-      <Card className="mb-6 p-6 bg-gradient-to-br from-primary to-accent border-0 shadow-lg">
-        <div className="flex justify-center">
-          <div className="relative">
-            <div className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center">
-              <div className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full border-8 border-white/20 flex flex-col items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 rounded-full" style={{
-                  background: `conic-gradient(from 0deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.8) ${overallScore}%, rgba(255,255,255,0.1) ${overallScore}%, rgba(255,255,255,0.1) 100%)`
-                }}></div>
-                <div className="relative z-10 text-center">
-                  <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-1">{overallScore}</div>
-                  <div className="text-xs sm:text-sm font-semibold text-white/90 tracking-wider">
-                    {overallScore >= 80 ? 'EXCELLENT' : overallScore >= 60 ? 'GOOD' : 'POOR'}
-                  </div>
-                  <div className="text-xs text-white/70 mt-1">CREDIT TIER</div>
-                </div>
+      <Card className="mb-6 p-4 bg-primary border shadow-md">
+        <div className="text-center">
+          <div className="inline-block">
+            <div className="w-32 h-32 rounded-full border-4 border-white/30 flex flex-col items-center justify-center bg-white/10">
+              <div className="text-2xl font-bold text-white">{overallScore}</div>
+              <div className="text-xs text-white/80">
+                {overallScore >= 80 ? 'Excellent' : overallScore >= 60 ? 'Good' : 'Fair'}
               </div>
             </div>
           </div>

@@ -129,8 +129,8 @@ const Home = () => {
               <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-primary rounded-card flex items-center justify-center mx-auto mb-4 sm:mb-6 lg:mb-8 shadow-level-2">
                 <Activity className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-white" />
               </div>
-              <h1 className="text-2xl sm:text-4xl lg:text-6xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-3 sm:mb-4 lg:mb-6">
-                Welcome back, <span className="text-accent">{user.email?.split('@')[0]}</span>
+              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-primary mb-3 sm:mb-4">
+                Welcome back, {user.email?.split('@')[0]}
               </h1>
               <p className="text-lg sm:text-xl lg:text-2xl text-neutral-secondary max-w-3xl mx-auto px-2">
                 Ready to apply for a loan or manage your existing applications?
@@ -142,12 +142,11 @@ const Home = () => {
               <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-primary rounded-card flex items-center justify-center mx-auto mb-4 sm:mb-6 lg:mb-8 shadow-level-2">
                 <Activity className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-white" />
               </div>
-              <h1 className="text-2xl sm:text-4xl lg:text-7xl font-bold mb-4 sm:mb-6 lg:mb-8">
-                <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Medical Credit</span>
-                <span className="block text-accent">Assessment</span>
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6">
+                Medical Credit Assessment
               </h1>
-              <p className="text-base sm:text-xl lg:text-2xl text-neutral-secondary max-w-4xl mx-auto leading-relaxed px-2">
-                Access affordable medical care with flexible payment options. Get approved in minutes with our AI-powered credit assessment.
+              <p className="text-base sm:text-lg text-neutral-secondary max-w-3xl mx-auto px-2">
+                Get medical loans with flexible payment options. Quick approval process based on your health and financial profile.
               </p>
             </div>
           )}

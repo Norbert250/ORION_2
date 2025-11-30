@@ -106,11 +106,11 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
         </div>
 
         {/* Composite Credit Score */}
-        <Card className="p-6 md:p-8 lg:p-12 bg-gradient-to-br from-primary via-primary to-accent border-0 shadow-xl rounded-3xl">
-          <div className="text-center space-y-6">
-            <div className="space-y-2">
-              <h2 className="text-white text-xl md:text-2xl font-bold tracking-wide">Health Credit Score</h2>
-              <p className="text-white/80 text-sm">Based on Medical & Financial Analysis</p>
+        <Card className="p-5 md:p-7 lg:p-9 bg-gradient-to-br from-primary to-accent border shadow-md rounded-xl">
+          <div className="text-center space-y-4">
+            <div>
+              <h2 className="text-white text-lg md:text-xl font-semibold mb-1">Your Credit Score</h2>
+              <p className="text-white/75 text-xs">Based on health and financial data</p>
             </div>
             
             <div className="flex justify-center">
@@ -153,7 +153,7 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
 
         {/* Medical Needs */}
         <Card 
-          className={`p-6 border-0 shadow-lg rounded-2xl bg-gradient-to-r from-white to-medical-light ${isAdminMode ? 'cursor-pointer hover:shadow-xl transition-all duration-300' : ''}`}
+          className={`p-5 border shadow-sm rounded-xl bg-white ${isAdminMode ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}`}
           onClick={(e) => {
             if (isAdminMode) {
               e.stopPropagation();
@@ -182,11 +182,11 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
             </CircularProgress>
 
             <div className="flex-1 space-y-2 sm:space-y-3 text-center sm:text-left w-full">
-              <div className="flex items-center gap-3 justify-center sm:justify-start">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-health-orange to-red-500 flex items-center justify-center">
-                  <span className="text-white text-sm font-bold">Rx</span>
+              <div className="flex items-center gap-2 justify-center sm:justify-start">
+                <div className="w-8 h-8 rounded-lg bg-health-orange flex items-center justify-center">
+                  <span className="text-white text-xs font-medium">Rx</span>
                 </div>
-                <h3 className="text-xl font-bold text-primary">Medical Assessment</h3>
+                <h3 className="text-lg font-semibold text-primary">Medical Assessment</h3>
               </div>
               
               <div className="grid grid-cols-2 gap-y-1.5 sm:gap-y-2 text-xs sm:text-sm">
@@ -207,7 +207,7 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
 
         {/* Asset Valuation */}
         <Card 
-          className={`p-6 border-0 shadow-lg rounded-2xl bg-gradient-to-r from-white to-blue-50 ${isAdminMode ? 'cursor-pointer hover:shadow-xl transition-all duration-300' : ''}`}
+          className={`p-5 border shadow-sm rounded-xl bg-white ${isAdminMode ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}`}
           onClick={(e) => {
             if (isAdminMode) {
               e.stopPropagation();
@@ -239,11 +239,11 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
             </CircularProgress>
 
             <div className="flex-1 space-y-2 sm:space-y-3 text-center sm:text-left w-full">
-              <div className="flex items-center gap-3 justify-center sm:justify-start">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center">
-                  <span className="text-white text-sm font-bold">💰</span>
+              <div className="flex items-center gap-2 justify-center sm:justify-start">
+                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+                  <span className="text-white text-xs">💰</span>
                 </div>
-                <h3 className="text-xl font-bold text-primary">Financial Assets</h3>
+                <h3 className="text-lg font-semibold text-primary">Financial Assets</h3>
               </div>
               
               <div className="grid grid-cols-2 gap-y-1.5 sm:gap-y-2 text-xs sm:text-sm">
@@ -264,7 +264,7 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
 
         {/* Behavioral Risk */}
         <Card 
-          className={`p-6 border-0 shadow-lg rounded-2xl bg-gradient-to-r from-white to-teal-50 ${isAdminMode ? 'cursor-pointer hover:shadow-xl transition-all duration-300' : ''}`}
+          className={`p-5 border shadow-sm rounded-xl bg-white ${isAdminMode ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}`}
           onClick={(e) => {
             if (isAdminMode) {
               e.stopPropagation();
@@ -293,11 +293,11 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
             </CircularProgress>
 
             <div className="flex-1 space-y-2 sm:space-y-3 text-center sm:text-left w-full">
-              <div className="flex items-center gap-3 justify-center sm:justify-start">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-teal-600 flex items-center justify-center">
-                  <span className="text-white text-sm font-bold">📈</span>
+              <div className="flex items-center gap-2 justify-center sm:justify-start">
+                <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
+                  <span className="text-white text-xs">📈</span>
                 </div>
-                <h3 className="text-xl font-bold text-primary">Behavioral Analysis</h3>
+                <h3 className="text-lg font-semibold text-primary">Behavioral Analysis</h3>
               </div>
               
               <div className="grid grid-cols-2 gap-y-1.5 sm:gap-y-2 text-xs sm:text-sm">
