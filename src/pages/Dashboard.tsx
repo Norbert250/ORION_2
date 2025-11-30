@@ -43,17 +43,19 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
   
   const getCreditLimit = (score: number) => {
     console.log('Medical Analysis:', formData?.medicalAnalysis);
-    console.log('Medical Score:', formData?.medicalScore);
+    console.log('Prescription Analysis:', formData?.prescriptionAnalysis);
     
-    const drugAmount = formData?.medicalAnalysis?.total_amount || 
-                      formData?.medicalAnalysis?.total_estimated_cost || 
-                      formData?.medicalAnalysis?.estimated_total_cost || 0;
-    const prescriptionAmount = formData?.medicalScore?.total_amount || 
-                              formData?.prescriptionAnalysis?.total_amount || 
-                              formData?.prescriptionAnalysis?.total_cost || 0;
+    // Get drug amount from medicines_info total_cost
+    const drugAmount = formData?.medicalAnalysis?.medicines_info?.reduce((sum, med) => sum + (med.total_cost || 0), 0) || 0;
+    
+    // Get prescription amount from total_estimated_price_all_files
+    const prescriptionAmount = formData?.prescriptionAnalysis?.total_estimated_price_all_files || 0;
+    
     const totalAmount = drugAmount + prescriptionAmount;
     
     console.log('Drug Amount:', drugAmount, 'Prescription Amount:', prescriptionAmount, 'Total:', totalAmount);
+    console.log('Full medicalAnalysis object:', JSON.stringify(formData?.medicalAnalysis, null, 2));
+    console.log('Full prescriptionAnalysis object:', JSON.stringify(formData?.prescriptionAnalysis, null, 2));
     
     return totalAmount > 0 ? `KSh ${totalAmount.toLocaleString()}` : 'KSh 0';
   };

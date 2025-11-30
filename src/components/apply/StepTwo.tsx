@@ -86,23 +86,37 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
   const scoreMedical = async (medicalConditions: string[], retries = 3) => {
     if (!navigator.onLine) throw new Error('No internet connection');
     
+    const requestData = { 
+      user_id: '12345',
+      age: parseInt(formData.age) || 25,
+      conditions: medicalConditions,
+      tests: []
+    };
+    
+    console.log('Medical scoring request data:', requestData);
+    
     for (let i = 0; i < retries; i++) {
       try {
         const response = await fetch('https://orionapisalpha.onrender.com/medical_scoring/score', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            user_id: '12345',
-            age: parseInt(formData.age) || 25,
-            conditions: medicalConditions,
-            tests: []
-          }),
+          body: JSON.stringify(requestData),
           signal: AbortSignal.timeout(30000)
         });
         
-        if (!response.ok) throw new Error(`Medical scoring failed: ${response.statusText}`);
-        return await response.json();
+        console.log('Medical scoring response status:', response.status);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Medical scoring API error:', errorText);
+          throw new Error(`Medical scoring failed: ${response.statusText} - ${errorText}`);
+        }
+        
+        const result = await response.json();
+        console.log('Medical scoring API response:', result);
+        return result;
       } catch (error) {
+        console.error(`Medical scoring attempt ${i + 1} failed:`, error);
         if (i === retries - 1) throw error;
         await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
       }
@@ -269,14 +283,40 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
                         
                         if (medicalNeedsResult.predicted_conditions && formData.age) {
                           setLoadingMessage('Scoring medical conditions...');
-                          console.log('🔄 Starting medical scoring...');
-                          const medicalScore = await scoreMedical(medicalNeedsResult.predicted_conditions);
-                          console.log('✅ Medical scoring complete:', medicalScore);
-                          updateFormData({ 
-                            medicalAnalysis: medicalNeedsResult, 
-                            medicalScore 
-                          });
+                          console.log('🔄 Starting medical scoring with conditions:', medicalNeedsResult.predicted_conditions);
+                          console.log('🔄 Age:', formData.age);
+                          
+                          try {
+                            const medicalScore = await scoreMedical(medicalNeedsResult.predicted_conditions);
+                            console.log('✅ Medical scoring complete:', medicalScore);
+                            
+                            // Add prescription bonus points to the drug analysis score
+                            const prescriptionBonus = formData?.prescriptionAnalysis ? 3 : 0;
+                            const totalMedicalScore = {
+                              ...medicalScore,
+                              score: (medicalScore.score || 0) + prescriptionBonus,
+                              scoring: {
+                                ...medicalScore.scoring,
+                                total_score: (medicalScore.scoring?.total_score || 0) + prescriptionBonus
+                              }
+                            };
+                            
+                            console.log('✅ Total medical score with prescription bonus:', totalMedicalScore);
+                            
+                            updateFormData({ 
+                              medicalAnalysis: medicalNeedsResult, 
+                              medicalScore: totalMedicalScore
+                            });
+                          } catch (scoringError) {
+                            console.error('❌ Medical scoring failed:', scoringError);
+                            // Continue with just the analysis result
+                            updateFormData({ medicalAnalysis: medicalNeedsResult });
+                          }
                         } else {
+                          console.log('⚠️ Missing conditions or age:', { 
+                            conditions: medicalNeedsResult.predicted_conditions, 
+                            age: formData.age 
+                          });
                           updateFormData({ medicalAnalysis: medicalNeedsResult });
                         }
                       } catch (error) {

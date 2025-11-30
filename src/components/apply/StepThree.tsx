@@ -414,12 +414,13 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
                       
                       // Add 3 points to current asset score
                       const currentAssetScore = formData?.creditEvaluation?.credit_score || 0;
-                      const bonusScore = { credit_score: currentAssetScore + 3 };
+                      const mpesaBonus = formData?.mpesaAnalysis ? 3 : 0;
+                      const totalAssetScore = { credit_score: currentAssetScore + 3 + mpesaBonus };
                       
                       updateFormData({ 
                         bankAnalysis, 
                         bankScore, 
-                        creditEvaluation: bonusScore 
+                        creditEvaluation: totalAssetScore 
                       });
                     } catch (error) {
                       console.error('❌ Bank statement analysis error:', error);
@@ -472,11 +473,12 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
                       
                       // Add 3 points to current asset score
                       const currentAssetScore = formData?.creditEvaluation?.credit_score || 0;
-                      const bonusScore = { credit_score: currentAssetScore + 3 };
+                      const bankBonus = formData?.bankScore ? 3 : 0;
+                      const totalAssetScore = { credit_score: currentAssetScore + 3 + bankBonus };
                       
                       updateFormData({ 
                         mpesaAnalysis, 
-                        creditEvaluation: bonusScore 
+                        creditEvaluation: totalAssetScore 
                       });
                     } catch (error) {
                       console.error('❌ M-Pesa analysis error:', error);
