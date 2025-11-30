@@ -151,7 +151,7 @@ export const StepFive = ({ formData, prevStep, handleSubmit }: StepFiveProps) =>
         {/* Contact & Occupation */}
         <div>
           <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2 sm:mb-3">Contact & Occupation</h3>
-          <div className="bg-muted/50 p-3 sm:p-4 rounded-lg space-y-2">
+          <div className="bg-review-background p-3 sm:p-4 rounded-lg space-y-2">
             <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-2">
               <span className="text-sm sm:text-base text-muted-foreground">Phone Number:</span>
               <span className="text-sm sm:text-base font-medium break-all">{formData.phoneNumber}</span>
@@ -168,7 +168,7 @@ export const StepFive = ({ formData, prevStep, handleSubmit }: StepFiveProps) =>
         {/* Personal & Medical */}
         <div>
           <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2 sm:mb-3">Personal & Medical Information</h3>
-          <div className="bg-muted/50 p-3 sm:p-4 rounded-lg space-y-2">
+          <div className="bg-review-background p-3 sm:p-4 rounded-lg space-y-2">
             <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-2">
               <span className="text-sm sm:text-base text-muted-foreground">Sex:</span>
               <span className="text-sm sm:text-base font-medium capitalize">{formData.sex}</span>
@@ -193,7 +193,7 @@ export const StepFive = ({ formData, prevStep, handleSubmit }: StepFiveProps) =>
         {/* Assets */}
         <div>
           <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2 sm:mb-3">Asset Information</h3>
-          <div className="bg-muted/50 p-3 sm:p-4 rounded-lg space-y-2">
+          <div className="bg-review-background p-3 sm:p-4 rounded-lg space-y-2">
             <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-2">
               <span className="text-sm sm:text-base text-muted-foreground">Asset Pictures:</span>
               <span className="text-sm sm:text-base font-medium">{formData.assetPictures.length} file(s)</span>
@@ -230,7 +230,7 @@ export const StepFive = ({ formData, prevStep, handleSubmit }: StepFiveProps) =>
         {/* Guarantors */}
         <div>
           <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2 sm:mb-3">Guarantor Information</h3>
-          <div className="bg-muted/50 p-3 sm:p-4 rounded-lg space-y-2">
+          <div className="bg-review-background p-3 sm:p-4 rounded-lg space-y-2">
             <div className="flex flex-col sm:flex-row sm:justify-between gap-1 sm:gap-2">
               <span className="text-sm sm:text-base text-muted-foreground">Call Log History:</span>
               <span className="text-sm sm:text-base font-medium break-all">{formData.callLogHistory?.name}</span>

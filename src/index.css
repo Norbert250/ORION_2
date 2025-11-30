@@ -4,23 +4,23 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%; /* #FFFFFF */
-    --foreground: 210 100% 1%; /* #000102 */
+    --background: 0 0% 100%; /* #ffffff */
+    --foreground: 210 11% 13%; /* #1c2024 */
 
-    --card: 0 0% 100%; /* #FFFFFF */
+    --card: 0 0% 100%; /* #ffffff */
     --card-foreground: 210 100% 1%;
 
     --popover: 0 0% 100%;
     --popover-foreground: 210 100% 1%;
 
-    --primary: 200 100% 40%; /* Medical Blue */
+    --primary: 210 100% 50%; /* #0090ff */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 200 20% 98%; /* Light Medical Blue */
     --secondary-foreground: 200 100% 25%;
 
     --muted: 200 15% 96%;
-    --muted-foreground: 200 10% 45%;
+    --muted-foreground: 220 7% 39%; /* #60646b */
 
     --accent: 160 100% 35%; /* Medical Teal */
     --accent-foreground: 0 0% 100%;
@@ -42,6 +42,7 @@
     --medical-teal: 160 100% 35%;
     --medical-light: 200 20% 98%;
     --medical-dark: 200 100% 25%;
+    --tier-background: 220 65% 24%; /* #123264 */
     
     --gradient-purple: linear-gradient(135deg, hsl(250 60% 60%) 0%, hsl(270 50% 50%) 100%);
     --gradient-score: linear-gradient(90deg, hsl(45 93% 47%), hsl(120 60% 50%), hsl(158 64% 52%));
@@ -66,7 +67,7 @@
     --popover: 210 65% 15%;
     --popover-foreground: 0 0% 100%;
 
-    --primary: 204 94% 54%;
+    --primary: 210 100% 50%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 210 65% 25%;

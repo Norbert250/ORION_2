@@ -335,7 +335,7 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
   return (
     <Card className="p-6 md:p-8">
       {/* Score Section */}
-      <Card className="mb-6 p-6 bg-primary border shadow-md">
+      <Card className="mb-6 p-6 bg-tier-background border shadow-md">
         <div className="text-center space-y-4">
           <h3 className="text-white text-lg font-semibold tracking-wide">COMPOSITE CREDIT SCORE</h3>
           

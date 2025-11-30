@@ -53,6 +53,16 @@ export default {
           green: "hsl(var(--health-green))",
           red: "hsl(var(--health-red))",
         },
+        tier: {
+          background: "#123264",
+        },
+        text: {
+          primary: "#1c2024",
+          secondary: "#60646b",
+        },
+        review: {
+          background: "#f4faff",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
