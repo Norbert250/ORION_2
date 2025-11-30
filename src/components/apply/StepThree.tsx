@@ -26,11 +26,35 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
   // Calculate real-time scores from API responses
   const medicalScore = formData?.medicalScore?.scoring?.total_score || 
                       formData?.medicalScore?.score || 0;
-  const assetScore = formData?.creditEvaluation?.credit_score || 0;
-  const behaviorScore = formData?.callLogsAnalysis?.credit_score || 
-                       formData?.callLogsAnalysis?.score || 0;
+  
+  // Asset score = (bank statement score + asset score) / 2
+  const bankScore = formData?.bankScore?.bank_statement_credit_score || 0;
+  const rawAssetScore = formData?.creditEvaluation?.credit_score || 0;
+  const assetScore = (bankScore && rawAssetScore) ? Math.round((bankScore + rawAssetScore) / 2) : (bankScore || rawAssetScore);
+  
+  // Behavior score = (M-Pesa behavior_score + call logs score) / 2 + bonuses (only if call logs exist)
+  const mpesaBehaviorScore = formData?.mpesaAnalysis?.credit_scores?.behavior_score || 0;
+  const callLogsScore = formData?.callLogsAnalysis?.credit_score || formData?.callLogsAnalysis?.score || 0;
+  const guarantor1Bonus = formData?.guarantor1IdAnalysis ? 3 : 0;
+  const guarantor2Bonus = formData?.guarantor2IdAnalysis ? 3 : 0;
+  
+  const behaviorScore = callLogsScore ? (
+    (mpesaBehaviorScore && callLogsScore) ? 
+      Math.round((mpesaBehaviorScore + callLogsScore) / 2) + guarantor1Bonus + guarantor2Bonus :
+      callLogsScore + guarantor1Bonus + guarantor2Bonus
+  ) : 0;
   
   const overallScore = Math.round(((medicalScore || 0) + (assetScore || 0) + (behaviorScore || 0)) / 3);
+  
+  console.log('STEP 3 DEBUG - Medical score:', medicalScore);
+  console.log('STEP 3 DEBUG - Bank score:', bankScore);
+  console.log('STEP 3 DEBUG - Raw asset score:', rawAssetScore);
+  console.log('STEP 3 DEBUG - Final asset score:', assetScore);
+  console.log('STEP 3 DEBUG - M-Pesa behavior score:', mpesaBehaviorScore);
+  console.log('STEP 3 DEBUG - Call logs score:', callLogsScore);
+  console.log('STEP 3 DEBUG - Guarantor bonuses:', guarantor1Bonus + guarantor2Bonus);
+  console.log('STEP 3 DEBUG - Behavior score (with bonuses):', behaviorScore);
+  console.log('STEP 3 DEBUG - Overall score:', overallScore);
 
   const analyzeGPS = async (files: File[]) => {
     const formData = new FormData();
@@ -140,8 +164,12 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
   const scoreBankStatement = async (bankAnalysisResult: any) => {
     console.log('Scoring bank statement...');
     
-    // Extract the credit_score_ready_values from the bank analysis result
-    const scoringData = bankAnalysisResult.credit_score_ready_values;
+    // Send the complete credit_score_ready_values structure
+    const scoringData = {
+      ...bankAnalysisResult.credit_score_ready_values,
+      user_id: '8988',
+      loan_id: 'LOAN_' + Date.now()
+    };
     
     const response = await fetch('https://orionapisalpha.onrender.com/bank/bankstatementscore', {
       method: 'POST',
@@ -307,14 +335,42 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
   return (
     <Card className="p-6 md:p-8">
       {/* Score Section */}
-      <Card className="mb-6 p-4 bg-primary border shadow-md">
-        <div className="text-center">
-          <div className="inline-block">
-            <div className="w-32 h-32 rounded-full border-4 border-white/30 flex flex-col items-center justify-center bg-white/10">
-              <div className="text-2xl font-bold text-white">{overallScore}</div>
-              <div className="text-xs text-white/80">
-                {overallScore >= 80 ? 'Excellent' : overallScore >= 60 ? 'Good' : 'Fair'}
+      <Card className="mb-6 p-6 bg-primary border shadow-md">
+        <div className="text-center space-y-4">
+          <h3 className="text-white text-lg font-semibold tracking-wide">COMPOSITE CREDIT SCORE</h3>
+          
+          <div className="flex justify-center">
+            <GradientCircularProgress
+              value={overallScore}
+              max={100}
+              size={140}
+              strokeWidth={12}
+              gradientId="compositeScoreGradient"
+              gradientColors={[
+                { offset: "0%", color: "hsl(var(--primary))" },
+                { offset: "100%", color: "hsl(var(--primary))" },
+              ]}
+              backgroundColor="rgba(255, 255, 255, 0.2)"
+            >
+              <div className="text-center">
+                <div className="text-4xl font-bold text-white">{overallScore}</div>
+                <div className="text-white/70 text-sm mt-1">/ 100</div>
               </div>
+            </GradientCircularProgress>
+          </div>
+
+          <div className="grid grid-cols-3 gap-4 text-white text-sm">
+            <div>
+              <div className="text-white/80 mb-1">Medical</div>
+              <div className="text-lg font-bold">{medicalScore || '--'}</div>
+            </div>
+            <div>
+              <div className="text-white/80 mb-1">Assets</div>
+              <div className="text-lg font-bold">{assetScore || '--'}</div>
+            </div>
+            <div>
+              <div className="text-white/80 mb-1">Behavior</div>
+              <div className="text-lg font-bold">{callLogsScore ? behaviorScore : '--'}</div>
             </div>
           </div>
         </div>
@@ -361,6 +417,8 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
                         const creditEvaluation = await evaluateCredit(assetAnalysis, null);
                         console.log('✅ Credit evaluation complete:', creditEvaluation);
                         
+                        console.log('Storing asset analysis:', assetAnalysis);
+                        console.log('Storing credit evaluation:', creditEvaluation);
                         updateFormData({ assetAnalysis, creditEvaluation });
                       } catch (error) {
                         console.error('❌ Asset analysis error:', error);

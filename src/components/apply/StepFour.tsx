@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { ApplicationFormData } from "@/types/form";
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { CircularProgress } from "@/components/CircularProgress";
+import { GradientCircularProgress } from "@/components/GradientCircularProgress";
 
 
 interface StepFourProps {
@@ -23,11 +24,36 @@ export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFi
   // Calculate real-time scores from API responses
   const medicalScore = formData?.medicalScore?.scoring?.total_score || 
                       formData?.medicalScore?.score || 0;
-  const assetScore = formData?.creditEvaluation?.credit_score || 0;
-  const behaviorScore = formData?.callLogsAnalysis?.credit_score || 
-                       formData?.callLogsAnalysis?.score || 0;
+  
+  // Asset score = (bank statement score + asset score) / 2 (same as Step 3)
+  const bankScore = formData?.bankScore?.bank_statement_credit_score || 0;
+  const rawAssetScore = formData?.creditEvaluation?.credit_score || 0;
+  const assetScore = (bankScore && rawAssetScore) ? Math.round((bankScore + rawAssetScore) / 2) : (bankScore || rawAssetScore);
+  
+  // Behavior score = (M-Pesa behavior_score + call logs score) / 2 + bonuses (only if call logs exist)
+  const mpesaBehaviorScore = formData?.mpesaAnalysis?.credit_scores?.behavior_score || 0;
+  const callLogsScore = formData?.callLogsAnalysis?.credit_score || formData?.callLogsAnalysis?.score || 0;
+  const guarantor1Bonus = formData?.guarantor1IdAnalysis ? 3 : 0;
+  const guarantor2Bonus = formData?.guarantor2IdAnalysis ? 3 : 0;
+  
+  const behaviorScore = callLogsScore ? (
+    (mpesaBehaviorScore && callLogsScore) ? 
+      Math.round((mpesaBehaviorScore + callLogsScore) / 2) + guarantor1Bonus + guarantor2Bonus :
+      callLogsScore + guarantor1Bonus + guarantor2Bonus
+  ) : 0;
   
   const overallScore = Math.round(((medicalScore || 0) + (assetScore || 0) + (behaviorScore || 0)) / 3);
+  
+  console.log('STEP 4 DEBUG - Medical score:', medicalScore);
+  console.log('STEP 4 DEBUG - Asset score:', assetScore);
+  console.log('STEP 4 DEBUG - M-Pesa behavior score:', mpesaBehaviorScore);
+  console.log('STEP 4 DEBUG - Call logs score:', callLogsScore);
+  console.log('STEP 4 DEBUG - Guarantor bonuses:', guarantor1Bonus + guarantor2Bonus);
+  console.log('STEP 4 DEBUG - Behavior score (with bonuses):', behaviorScore);
+  console.log('STEP 4 DEBUG - Overall score:', overallScore);
+  console.log('STEP 4 DEBUG - formData.mpesaAnalysis:', formData?.mpesaAnalysis);
+  console.log('STEP 4 DEBUG - M-Pesa credit_scores:', formData?.mpesaAnalysis?.credit_scores);
+  console.log('STEP 4 DEBUG - formData.callLogsAnalysis:', formData?.callLogsAnalysis);
 
   const analyzeCallLogs = async (file: File) => {
     const formData = new FormData();
@@ -86,22 +112,42 @@ export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFi
   return (
     <Card className="p-6 md:p-8">
       {/* Score Section */}
-      <Card className="mb-6 p-6 bg-gradient-to-br from-primary to-accent border-0 shadow-lg">
-        <div className="flex justify-center">
-          <div className="relative">
-            <div className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center">
-              <div className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full border-8 border-white/20 flex flex-col items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 rounded-full" style={{
-                  background: `conic-gradient(from 0deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.8) ${overallScore}%, rgba(255,255,255,0.1) ${overallScore}%, rgba(255,255,255,0.1) 100%)`
-                }}></div>
-                <div className="relative z-10 text-center">
-                  <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-1">{overallScore}</div>
-                  <div className="text-xs sm:text-sm font-semibold text-white/90 tracking-wider">
-                    {overallScore >= 80 ? 'EXCELLENT' : overallScore >= 60 ? 'GOOD' : 'POOR'}
-                  </div>
-                  <div className="text-xs text-white/70 mt-1">CREDIT TIER</div>
-                </div>
+      <Card className="mb-6 p-6 bg-primary border shadow-md">
+        <div className="text-center space-y-4">
+          <h3 className="text-white text-lg font-semibold tracking-wide">COMPOSITE CREDIT SCORE</h3>
+          
+          <div className="flex justify-center">
+            <GradientCircularProgress
+              value={overallScore}
+              max={100}
+              size={140}
+              strokeWidth={12}
+              gradientId="compositeScoreGradient"
+              gradientColors={[
+                { offset: "0%", color: "hsl(var(--primary))" },
+                { offset: "100%", color: "hsl(var(--primary))" },
+              ]}
+              backgroundColor="rgba(255, 255, 255, 0.2)"
+            >
+              <div className="text-center">
+                <div className="text-4xl font-bold text-white">{overallScore}</div>
+                <div className="text-white/70 text-sm mt-1">/ 100</div>
               </div>
+            </GradientCircularProgress>
+          </div>
+
+          <div className="grid grid-cols-3 gap-4 text-white text-sm">
+            <div>
+              <div className="text-white/80 mb-1">Medical</div>
+              <div className="text-lg font-bold">{medicalScore || '--'}</div>
+            </div>
+            <div>
+              <div className="text-white/80 mb-1">Assets</div>
+              <div className="text-lg font-bold">{assetScore || '--'}</div>
+            </div>
+            <div>
+              <div className="text-white/80 mb-1">Behavior</div>
+              <div className="text-lg font-bold">{callLogsScore ? behaviorScore : '--'}</div>
             </div>
           </div>
         </div>

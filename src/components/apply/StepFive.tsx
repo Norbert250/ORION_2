@@ -74,17 +74,28 @@ export const StepFive = ({ formData, prevStep, handleSubmit }: StepFiveProps) =>
       setIsSubmitting(false);
     }
   };
-  // Calculate real-time scores from API responses
+  // Calculate real-time scores from API responses (same as Steps 3 & 4)
   const medicalScore = formData?.medicalScore?.scoring?.total_score || 
-                      formData?.medicalScore?.score || 
-                      formData?.bankScore?.bank_statement_credit_score || 0;
-  const assetScore = formData?.creditEvaluation?.credit_score || 
-                    formData?.assetAnalysis?.total_estimated_value || 0;
-  const behaviorScore = formData?.callLogsAnalysis?.credit_score || 
-                       formData?.callLogsAnalysis?.score || 0;
+                      formData?.medicalScore?.score || 0;
   
-  const overallScore = (medicalScore || assetScore || behaviorScore) ? 
-    Math.round(((medicalScore || 0) + (assetScore || 0) + (behaviorScore || 0)) / 3) : 0;
+  // Asset score = (bank statement score + asset score) / 2
+  const bankScore = formData?.bankScore?.bank_statement_credit_score || 0;
+  const rawAssetScore = formData?.creditEvaluation?.credit_score || 0;
+  const assetScore = (bankScore && rawAssetScore) ? Math.round((bankScore + rawAssetScore) / 2) : (bankScore || rawAssetScore);
+  
+  // Behavior score = (M-Pesa behavior_score + call logs score) / 2 + bonuses (only if call logs exist)
+  const mpesaBehaviorScore = formData?.mpesaAnalysis?.credit_scores?.behavior_score || 0;
+  const callLogsScore = formData?.callLogsAnalysis?.credit_score || formData?.callLogsAnalysis?.score || 0;
+  const guarantor1Bonus = formData?.guarantor1IdAnalysis ? 3 : 0;
+  const guarantor2Bonus = formData?.guarantor2IdAnalysis ? 3 : 0;
+  
+  const behaviorScore = callLogsScore ? (
+    (mpesaBehaviorScore && callLogsScore) ? 
+      Math.round((mpesaBehaviorScore + callLogsScore) / 2) + guarantor1Bonus + guarantor2Bonus :
+      callLogsScore + guarantor1Bonus + guarantor2Bonus
+  ) : 0;
+  
+  const overallScore = Math.round(((medicalScore || 0) + (assetScore || 0) + (behaviorScore || 0)) / 3);
 
   return (
     <Card className="p-4 sm:p-6 md:p-8">
@@ -124,7 +135,7 @@ export const StepFive = ({ formData, prevStep, handleSubmit }: StepFiveProps) =>
             </div>
             <div>
               <div className="text-white/80 mb-1">Behavior</div>
-              <div className="text-lg font-bold">{behaviorScore || '--'}</div>
+              <div className="text-lg font-bold">{callLogsScore ? behaviorScore : '--'}</div>
             </div>
           </div>
         </div>

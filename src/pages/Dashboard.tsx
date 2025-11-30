@@ -22,16 +22,28 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
   const [selectedApiData, setSelectedApiData] = useState<any>(null);
   const [apiDataTitle, setApiDataTitle] = useState("");
   
-  // Calculate dynamic scores from API responses
+  // Calculate dynamic scores from API responses (same as Steps 3, 4 & 5)
   const medicalScore = formData?.medicalScore?.scoring?.total_score || 
                       formData?.medicalScore?.score || 0;
-  const assetScore = formData?.creditEvaluation?.credit_score || 
-                    formData?.assetAnalysis?.total_estimated_value || 0;
-  const behaviorScore = formData?.callLogsAnalysis?.credit_score || 
-                       formData?.callLogsAnalysis?.score || 0;
   
-  const overallScore = (medicalScore || assetScore || behaviorScore) ? 
-    Math.round(((medicalScore || 0) + (assetScore || 0) + (behaviorScore || 0)) / 3) : 0;
+  // Asset score = (bank statement score + asset score) / 2
+  const bankScore = formData?.bankScore?.bank_statement_credit_score || 0;
+  const rawAssetScore = formData?.creditEvaluation?.credit_score || 0;
+  const assetScore = (bankScore && rawAssetScore) ? Math.round((bankScore + rawAssetScore) / 2) : (bankScore || rawAssetScore);
+  
+  // Behavior score = (M-Pesa behavior_score + call logs score) / 2 + bonuses (only if call logs exist)
+  const mpesaBehaviorScore = formData?.mpesaAnalysis?.credit_scores?.behavior_score || 0;
+  const callLogsScore = formData?.callLogsAnalysis?.credit_score || formData?.callLogsAnalysis?.score || 0;
+  const guarantor1Bonus = formData?.guarantor1IdAnalysis ? 3 : 0;
+  const guarantor2Bonus = formData?.guarantor2IdAnalysis ? 3 : 0;
+  
+  const behaviorScore = callLogsScore ? (
+    (mpesaBehaviorScore && callLogsScore) ? 
+      Math.round((mpesaBehaviorScore + callLogsScore) / 2) + guarantor1Bonus + guarantor2Bonus :
+      callLogsScore + guarantor1Bonus + guarantor2Bonus
+  ) : 0;
+  
+  const overallScore = Math.round(((medicalScore || 0) + (assetScore || 0) + (behaviorScore || 0)) / 3);
   
   // Determine risk level
   const getRiskLevel = (score: number) => {
@@ -250,9 +262,18 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
               
               <div className="grid grid-cols-2 gap-y-1.5 sm:gap-y-2 text-xs sm:text-sm">
                 <div className="text-muted-foreground text-left">Total Assets</div>
-                <div className="font-semibold text-foreground text-right">KSh 8,500,000</div>
+                <div className="font-semibold text-foreground text-right">
+                  KSh {(formData?.assetAnalysis?.analysis_result?.credit_features?.total_asset_value || 
+                       formData?.assetAnalysis?.credit_features?.total_asset_value ||
+                       formData?.assetAnalysis?.analysis_result?.summary?.total_estimated_value || 0).toLocaleString()}
+                </div>
                 <div className="text-muted-foreground text-left">Debt-to-Income</div>
-                <div className="font-semibold text-foreground text-right">32%</div>
+                <div className="font-semibold text-foreground text-right">
+                  {formData?.bankAnalysis?.credit_score_ready_values?.features?.withdrawals_opening_ratio 
+                    ? `${(formData.bankAnalysis.credit_score_ready_values.features.withdrawals_opening_ratio * 100).toFixed(1)}%`
+                    : 'N/A'
+                  }
+                </div>
                 <div className="text-muted-foreground text-left">Monthly Income</div>
                 <div className="font-semibold text-foreground text-right">KSh 520,000</div>
               </div>

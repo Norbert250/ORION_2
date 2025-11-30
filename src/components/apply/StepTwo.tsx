@@ -31,7 +31,9 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
   const behaviorScore = formData?.callLogsAnalysis?.credit_score || 
                        formData?.callLogsAnalysis?.score || 0;
   
-  console.log('Final scores:', { medicalScore, assetScore, behaviorScore });
+  console.log('STEP 2 DEBUG - Final scores:', { medicalScore, assetScore, behaviorScore });
+  console.log('STEP 2 DEBUG - Medical score displayed in tier:', medicalScore);
+  console.log('STEP 2 DEBUG - formData.medicalScore:', formData?.medicalScore);
   
   const overallScore = Math.round(((medicalScore || 0) + (assetScore || 0) + (behaviorScore || 0)) / 3);
 
@@ -86,22 +88,21 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
   const scoreMedical = async (medicalConditions: string[], retries = 3) => {
     if (!navigator.onLine) throw new Error('No internet connection');
     
-    const requestData = { 
-      user_id: '12345',
+    const requestData = {
       age: parseInt(formData.age) || 25,
-      conditions: medicalConditions,
-      tests: []
+      conditions: medicalConditions
     };
     
-    console.log('Medical scoring request data:', requestData);
+    console.log('Medical scoring request data:', JSON.stringify(requestData, null, 2));
+    console.log('Conditions array:', medicalConditions);
+    console.log('Age:', parseInt(formData.age));
     
     for (let i = 0; i < retries; i++) {
       try {
-        const response = await fetch('https://orionapisalpha.onrender.com/medical_scoring/score', {
+        const response = await fetch('https://web-production-587b9.up.railway.app/score', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestData),
-          signal: AbortSignal.timeout(30000)
+          body: JSON.stringify(requestData)
         });
         
         console.log('Medical scoring response status:', response.status);
@@ -113,7 +114,7 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
         }
         
         const result = await response.json();
-        console.log('Medical scoring API response:', result);
+        console.log('Medical scoring API response:', JSON.stringify(result, null, 2));
         return result;
       } catch (error) {
         console.error(`Medical scoring attempt ${i + 1} failed:`, error);
@@ -135,14 +136,42 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
   return (
     <Card className="p-6 md:p-8">
       {/* Score Section */}
-      <Card className="mb-6 p-4 bg-primary border shadow-md">
-        <div className="text-center">
-          <div className="inline-block">
-            <div className="w-32 h-32 rounded-full border-4 border-white/30 flex flex-col items-center justify-center bg-white/10">
-              <div className="text-2xl font-bold text-white">{overallScore}</div>
-              <div className="text-xs text-white/80">
-                {overallScore >= 80 ? 'Excellent' : overallScore >= 60 ? 'Good' : 'Fair'}
+      <Card className="mb-6 p-6 bg-primary border shadow-md">
+        <div className="text-center space-y-4">
+          <h3 className="text-white text-lg font-semibold tracking-wide">COMPOSITE CREDIT SCORE</h3>
+          
+          <div className="flex justify-center">
+            <GradientCircularProgress
+              value={overallScore}
+              max={100}
+              size={140}
+              strokeWidth={12}
+              gradientId="compositeScoreGradient"
+              gradientColors={[
+                { offset: "0%", color: "hsl(var(--primary))" },
+                { offset: "100%", color: "hsl(var(--primary))" },
+              ]}
+              backgroundColor="rgba(255, 255, 255, 0.2)"
+            >
+              <div className="text-center">
+                <div className="text-4xl font-bold text-white">{overallScore}</div>
+                <div className="text-white/70 text-sm mt-1">/ 100</div>
               </div>
+            </GradientCircularProgress>
+          </div>
+
+          <div className="grid grid-cols-3 gap-4 text-white text-sm">
+            <div>
+              <div className="text-white/80 mb-1">Medical</div>
+              <div className="text-lg font-bold">{medicalScore || '--'}</div>
+            </div>
+            <div>
+              <div className="text-white/80 mb-1">Assets</div>
+              <div className="text-lg font-bold">{assetScore || '--'}</div>
+            </div>
+            <div>
+              <div className="text-white/80 mb-1">Behavior</div>
+              <div className="text-lg font-bold">{behaviorScore || '--'}</div>
             </div>
           </div>
         </div>
@@ -291,14 +320,17 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
                             const medicalScore = await scoreMedical(medicalNeedsResult.predicted_conditions);
                             console.log('✅ Medical scoring complete:', medicalScore);
                             
-                            // Add prescription bonus points to the drug analysis score
+                            // Medical score = API score + prescription bonus
+                            const apiScore = medicalScore.score || medicalScore.scoring?.total_score || 0;
                             const prescriptionBonus = formData?.prescriptionAnalysis ? 3 : 0;
+                            const totalScore = apiScore + prescriptionBonus;
+                            
                             const totalMedicalScore = {
                               ...medicalScore,
-                              score: (medicalScore.score || 0) + prescriptionBonus,
+                              score: totalScore,
                               scoring: {
                                 ...medicalScore.scoring,
-                                total_score: (medicalScore.scoring?.total_score || 0) + prescriptionBonus
+                                total_score: totalScore
                               }
                             };
                             
