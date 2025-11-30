@@ -69,9 +69,9 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
       formData.append('files', file);
     });
     
-    console.log('Sending to Assets API:', 'https://157.245.20.199:8000/analysis/create_batch');
+    console.log('Sending to Assets API:', 'http://157.245.20.199:8000/analysis/create_batch');
     
-    const response = await fetch('https://157.245.20.199:8000/analysis/create_batch', {
+    const response = await fetch('http://157.245.20.199:8000/analysis/create_batch', {
       method: 'POST',
       body: formData,
     });
