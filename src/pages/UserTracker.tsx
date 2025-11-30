@@ -146,76 +146,95 @@ const UserTracker = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-8">
-      <div className="mx-auto max-w-7xl">
-        <div className="flex items-center justify-between mb-8">
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Users className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold">User Form Tracker</h1>
+            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+              <Users className="h-6 w-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-semibold text-gray-900">CheckupsMed Admin</h1>
+              <p className="text-sm text-gray-500">User Application Tracker</p>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
-            <span className="text-sm text-muted-foreground">
-              {isConnected ? 'Live' : 'Disconnected'}
-            </span>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-full">
+              <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
+              <span className="text-xs font-medium text-gray-600">
+                {isConnected ? 'Live Updates' : 'Disconnected'}
+              </span>
+            </div>
           </div>
         </div>
+      </div>
+      
+      <div className="p-6">
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Sessions</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.total}</div>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white p-4 rounded-xl border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Applications</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+              </div>
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Users className="h-5 w-5 text-blue-600" />
+              </div>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">In Progress</CardTitle>
-              <Clock className="h-4 w-4 text-blue-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-500">{stats.inProgress}</div>
-            </CardContent>
-          </Card>
+          <div className="bg-white p-4 rounded-xl border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">In Progress</p>
+                <p className="text-2xl font-bold text-blue-600">{stats.inProgress}</p>
+              </div>
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Clock className="h-5 w-5 text-blue-600" />
+              </div>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Submitted</CardTitle>
-              <CheckCircle className="h-4 w-4 text-green-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-500">{stats.submitted}</div>
-            </CardContent>
-          </Card>
+          <div className="bg-white p-4 rounded-xl border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Completed</p>
+                <p className="text-2xl font-bold text-green-600">{stats.submitted}</p>
+              </div>
+              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+              </div>
+            </div>
+          </div>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Left</CardTitle>
-              <XCircle className="h-4 w-4 text-red-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-red-500">{stats.left}</div>
-            </CardContent>
-          </Card>
+          <div className="bg-white p-4 rounded-xl border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Abandoned</p>
+                <p className="text-2xl font-bold text-red-600">{stats.left}</p>
+              </div>
+              <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                <XCircle className="h-5 w-5 text-red-600" />
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Sessions Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>User Sessions</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <div className="bg-white rounded-xl border border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900">Recent Applications</h2>
+            <p className="text-sm text-gray-500">Monitor user application progress in real-time</p>
+          </div>
+          <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Phone Number</TableHead>
                   <TableHead>Current Step</TableHead>
-                  <TableHead>Current Field</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Started</TableHead>
                   <TableHead>Last Activity</TableHead>
@@ -226,14 +245,22 @@ const UserTracker = () => {
                   <TableRow key={session.id}>
                     <TableCell className="font-medium">{session.phone_number}</TableCell>
                     <TableCell>
-                      <Badge variant="outline">
-                        {getStepName(session.current_step)}
-                      </Badge>
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm font-semibold text-primary">
+                          {session.current_step}
+                        </div>
+                        <span className="font-medium">{getStepName(session.current_step)}</span>
+                      </div>
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {session.current_field}
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${
+                          session.status === 'inprogress' ? 'bg-blue-500' :
+                          session.status === 'submitted' ? 'bg-green-500' : 'bg-red-500'
+                        }`}></div>
+                        <span className="capitalize font-medium">{session.status.replace('inprogress', 'In Progress')}</span>
+                      </div>
                     </TableCell>
-                    <TableCell>{getStatusBadge(session.status)}</TableCell>
                     <TableCell className="text-sm">
                       {formatTime(session.started_at)}
                     </TableCell>
@@ -250,12 +277,14 @@ const UserTracker = () => {
               </TableBody>
             </Table>
             {sessions.length === 0 && (
-              <div className="text-center py-8 text-muted-foreground">
-                No user sessions found
+              <div className="text-center py-12 text-gray-500">
+                <Users className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                <p className="text-lg font-medium">No applications found</p>
+                <p className="text-sm">Applications will appear here as users start the process</p>
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
