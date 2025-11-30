@@ -46,7 +46,7 @@ const Home = () => {
               <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-lg flex items-center justify-center">
                 <Activity className="h-5 w-5 sm:h-6 sm:w-6 text-primary-foreground" />
               </div>
-              <span className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">Checkups Orion</span>
+              <span className="text-lg sm:text-xl md:text-2xl font-bold text-foreground">CheckupsMed</span>
             </div>
             
             {/* Desktop Navigation */}
@@ -129,8 +129,8 @@ const Home = () => {
               <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-primary rounded-card flex items-center justify-center mx-auto mb-4 sm:mb-6 lg:mb-8 shadow-level-2">
                 <Activity className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-white" />
               </div>
-              <h1 className="text-2xl sm:text-4xl lg:text-6xl font-bold text-primary mb-3 sm:mb-4 lg:mb-6">
-                Welcome back, <span className="text-light-blue">{user.email?.split('@')[0]}</span>
+              <h1 className="text-2xl sm:text-4xl lg:text-6xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-3 sm:mb-4 lg:mb-6">
+                Welcome back, <span className="text-accent">{user.email?.split('@')[0]}</span>
               </h1>
               <p className="text-lg sm:text-xl lg:text-2xl text-neutral-secondary max-w-3xl mx-auto px-2">
                 Ready to apply for a loan or manage your existing applications?
@@ -142,9 +142,9 @@ const Home = () => {
               <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-primary rounded-card flex items-center justify-center mx-auto mb-4 sm:mb-6 lg:mb-8 shadow-level-2">
                 <Activity className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-white" />
               </div>
-              <h1 className="text-2xl sm:text-4xl lg:text-7xl font-bold text-primary mb-4 sm:mb-6 lg:mb-8">
-                Healthcare Financing,
-                <span className="block text-light-blue">Simplified</span>
+              <h1 className="text-2xl sm:text-4xl lg:text-7xl font-bold mb-4 sm:mb-6 lg:mb-8">
+                <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Medical Credit</span>
+                <span className="block text-accent">Assessment</span>
               </h1>
               <p className="text-base sm:text-xl lg:text-2xl text-neutral-secondary max-w-4xl mx-auto leading-relaxed px-2">
                 Access affordable medical care with flexible payment options. Get approved in minutes with our AI-powered credit assessment.
@@ -216,7 +216,7 @@ const Home = () => {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-8 sm:mb-12">
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-primary mb-4">
-                Why Choose Checkups Orion?
+                Why Choose CheckupsMed?
               </h2>
               <p className="text-neutral-secondary text-base sm:text-lg max-w-2xl mx-auto">
                 We make healthcare financing accessible, transparent, and stress-free
@@ -268,7 +268,7 @@ const Home = () => {
                   <Activity className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-xl font-bold text-primary">Checkups Orion</h3>
+                  <h3 className="text-lg sm:text-xl font-bold text-primary">CheckupsMed</h3>
                   <p className="text-neutral-secondary text-sm sm:text-base">Financial Solutions for Everyone</p>
                 </div>
               </div>
@@ -288,7 +288,7 @@ const Home = () => {
 
           <div className="border-t border-neutral-border pt-6 sm:pt-8 text-center">
             <p className="text-neutral-secondary text-sm sm:text-base">
-              &copy; {new Date().getFullYear()} Checkups Orion. All rights reserved.
+              &copy; {new Date().getFullYear()} CheckupsMed. All rights reserved.
             </p>
           </div>
         </div>

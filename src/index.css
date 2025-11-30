@@ -13,16 +13,16 @@
     --popover: 0 0% 100%;
     --popover-foreground: 210 100% 1%;
 
-    --primary: 204 94% 54%; /* #1F9BF6 */
+    --primary: 200 100% 40%; /* Medical Blue */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 20% 96%; /* #F3F5F6 */
-    --secondary-foreground: 210 65% 20%;
+    --secondary: 200 20% 98%; /* Light Medical Blue */
+    --secondary-foreground: 200 100% 25%;
 
-    --muted: 210 20% 96%;
-    --muted-foreground: 220 12% 39%; /* #5A6270 */
+    --muted: 200 15% 96%;
+    --muted-foreground: 200 10% 45%;
 
-    --accent: 210 65% 20%; /* #103153 */
+    --accent: 160 100% 35%; /* Medical Teal */
     --accent-foreground: 0 0% 100%;
 
     --destructive: 356 78% 54%; /* #E42D35 */
@@ -36,8 +36,12 @@
     
     --health-orange: 28 100% 50%;
     --health-yellow: 45 93% 47%;
-    --health-green: 158 64% 52%;
+    --health-green: 160 100% 35%;
     --health-red: 0 84% 60%;
+    --medical-blue: 200 100% 40%;
+    --medical-teal: 160 100% 35%;
+    --medical-light: 200 20% 98%;
+    --medical-dark: 200 100% 25%;
     
     --gradient-purple: linear-gradient(135deg, hsl(250 60% 60%) 0%, hsl(270 50% 50%) 100%);
     --gradient-score: linear-gradient(90deg, hsl(45 93% 47%), hsl(120 60% 50%), hsl(158 64% 52%));

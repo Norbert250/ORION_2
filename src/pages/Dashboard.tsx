@@ -42,9 +42,19 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
   };
   
   const getCreditLimit = (score: number) => {
-    const drugAmount = formData?.medicalAnalysis?.total_amount || 0;
-    const prescriptionAmount = formData?.medicalScore?.total_amount || 0;
+    console.log('Medical Analysis:', formData?.medicalAnalysis);
+    console.log('Medical Score:', formData?.medicalScore);
+    
+    const drugAmount = formData?.medicalAnalysis?.total_amount || 
+                      formData?.medicalAnalysis?.total_estimated_cost || 
+                      formData?.medicalAnalysis?.estimated_total_cost || 0;
+    const prescriptionAmount = formData?.medicalScore?.total_amount || 
+                              formData?.prescriptionAnalysis?.total_amount || 
+                              formData?.prescriptionAnalysis?.total_cost || 0;
     const totalAmount = drugAmount + prescriptionAmount;
+    
+    console.log('Drug Amount:', drugAmount, 'Prescription Amount:', prescriptionAmount, 'Total:', totalAmount);
+    
     return totalAmount > 0 ? `KSh ${totalAmount.toLocaleString()}` : 'KSh 0';
   };
   
@@ -82,18 +92,26 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
     <div className="min-h-screen bg-background p-3 sm:p-4 md:p-8">
       <div className="mx-auto max-w-2xl space-y-4 md:space-y-6">
         {/* Header */}
-        <div className="text-center space-y-2">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-2">
-            <Activity className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary">Checkups Orion</h1>
+        <div className="text-center space-y-4 mb-8">
+          <div className="flex flex-col items-center justify-center gap-3">
+            <div className="w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center shadow-lg">
+              <Activity className="h-8 w-8 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold text-primary mb-2">CheckupsMed</h1>
+              <p className="text-lg text-accent font-semibold">Credit Assessment</p>
+            </div>
           </div>
-          <p className="text-muted-foreground text-base sm:text-lg">Credit Assessment Dashboard</p>
+          <p className="text-muted-foreground text-base max-w-md mx-auto">Comprehensive health-based financial evaluation powered by medical data analysis</p>
         </div>
 
         {/* Composite Credit Score */}
-        <Card className="p-4 sm:p-6 md:p-8 lg:p-12 bg-gradient-to-br from-primary to-accent border-none shadow-lg">
-          <div className="text-center space-y-4 sm:space-y-6">
-            <h2 className="text-white text-lg sm:text-xl md:text-2xl font-semibold tracking-wide">COMPOSITE CREDIT SCORE</h2>
+        <Card className="p-6 md:p-8 lg:p-12 bg-gradient-to-br from-primary via-primary to-accent border-0 shadow-xl rounded-3xl">
+          <div className="text-center space-y-6">
+            <div className="space-y-2">
+              <h2 className="text-white text-xl md:text-2xl font-bold tracking-wide">Health Credit Score</h2>
+              <p className="text-white/80 text-sm">Based on Medical & Financial Analysis</p>
+            </div>
             
             <div className="flex justify-center">
               <GradientCircularProgress
@@ -135,7 +153,7 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
 
         {/* Medical Needs */}
         <Card 
-          className={`p-4 sm:p-6 ${isAdminMode ? 'cursor-pointer hover:shadow-lg transition-shadow' : ''}`}
+          className={`p-6 border-0 shadow-lg rounded-2xl bg-gradient-to-r from-white to-medical-light ${isAdminMode ? 'cursor-pointer hover:shadow-xl transition-all duration-300' : ''}`}
           onClick={(e) => {
             if (isAdminMode) {
               e.stopPropagation();
@@ -164,9 +182,11 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
             </CircularProgress>
 
             <div className="flex-1 space-y-2 sm:space-y-3 text-center sm:text-left w-full">
-              <div className="flex items-center gap-2 justify-center sm:justify-start">
-                <div className="w-3 h-3 rounded-full bg-health-orange"></div>
-                <h3 className="text-lg sm:text-xl font-bold text-foreground">Medical Needs</h3>
+              <div className="flex items-center gap-3 justify-center sm:justify-start">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-health-orange to-red-500 flex items-center justify-center">
+                  <span className="text-white text-sm font-bold">Rx</span>
+                </div>
+                <h3 className="text-xl font-bold text-primary">Medical Assessment</h3>
               </div>
               
               <div className="grid grid-cols-2 gap-y-1.5 sm:gap-y-2 text-xs sm:text-sm">
@@ -187,7 +207,7 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
 
         {/* Asset Valuation */}
         <Card 
-          className={`p-4 sm:p-6 ${isAdminMode ? 'cursor-pointer hover:shadow-lg transition-shadow' : ''}`}
+          className={`p-6 border-0 shadow-lg rounded-2xl bg-gradient-to-r from-white to-blue-50 ${isAdminMode ? 'cursor-pointer hover:shadow-xl transition-all duration-300' : ''}`}
           onClick={(e) => {
             if (isAdminMode) {
               e.stopPropagation();
@@ -219,9 +239,11 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
             </CircularProgress>
 
             <div className="flex-1 space-y-2 sm:space-y-3 text-center sm:text-left w-full">
-              <div className="flex items-center gap-2 justify-center sm:justify-start">
-                <div className="w-3 h-3 rounded-full bg-health-yellow"></div>
-                <h3 className="text-lg sm:text-xl font-bold text-foreground">Asset Valuation</h3>
+              <div className="flex items-center gap-3 justify-center sm:justify-start">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center">
+                  <span className="text-white text-sm font-bold">💰</span>
+                </div>
+                <h3 className="text-xl font-bold text-primary">Financial Assets</h3>
               </div>
               
               <div className="grid grid-cols-2 gap-y-1.5 sm:gap-y-2 text-xs sm:text-sm">
@@ -242,7 +264,7 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
 
         {/* Behavioral Risk */}
         <Card 
-          className={`p-4 sm:p-6 ${isAdminMode ? 'cursor-pointer hover:shadow-lg transition-shadow' : ''}`}
+          className={`p-6 border-0 shadow-lg rounded-2xl bg-gradient-to-r from-white to-teal-50 ${isAdminMode ? 'cursor-pointer hover:shadow-xl transition-all duration-300' : ''}`}
           onClick={(e) => {
             if (isAdminMode) {
               e.stopPropagation();
@@ -271,9 +293,11 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
             </CircularProgress>
 
             <div className="flex-1 space-y-2 sm:space-y-3 text-center sm:text-left w-full">
-              <div className="flex items-center gap-2 justify-center sm:justify-start">
-                <div className="w-3 h-3 rounded-full bg-health-green"></div>
-                <h3 className="text-lg sm:text-xl font-bold text-foreground">Behavioral Risk</h3>
+              <div className="flex items-center gap-3 justify-center sm:justify-start">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent to-teal-600 flex items-center justify-center">
+                  <span className="text-white text-sm font-bold">📈</span>
+                </div>
+                <h3 className="text-xl font-bold text-primary">Behavioral Analysis</h3>
               </div>
               
               <div className="grid grid-cols-2 gap-y-1.5 sm:gap-y-2 text-xs sm:text-sm">
@@ -296,20 +320,20 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <Button
             size="lg"
-            className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground text-sm sm:text-base"
+            className="flex-1 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white text-sm sm:text-base rounded-xl shadow-lg"
             onClick={() => alert("Export functionality coming soon!")}
           >
             <FileDown className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-            <span className="truncate">Export to PowerPoint</span>
+            <span className="truncate">Export Report</span>
           </Button>
           <Button
             size="lg"
             variant="outline"
-            className="flex-1 text-sm sm:text-base"
+            className="flex-1 text-sm sm:text-base border-2 border-primary text-primary hover:bg-primary hover:text-white rounded-xl"
             onClick={() => navigate("/")}
           >
             <RefreshCw className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-            Back to Home
+            New Assessment
           </Button>
         </div>
 
