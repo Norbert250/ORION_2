@@ -68,7 +68,7 @@ const Apply = () => {
   
   return (
     <div className="min-h-screen bg-background p-3 sm:p-4 md:p-8">
-      <div className="mx-auto max-w-3xl">
+      <div className="mx-auto max-w-6xl">
         {/* Header */}
         <div className="text-center space-y-2 mb-6 sm:mb-8">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2">

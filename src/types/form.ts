@@ -6,6 +6,7 @@ export interface ApplicationFormData {
   workType: string;
   sex: string;
   age: string;
+  yearOfBirth?: string;
   medicalPrescription: File[];
   drugImage: File[];
   assetPictures: File[];

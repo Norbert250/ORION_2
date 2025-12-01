@@ -81,19 +81,19 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
   
   // Tier functions based on scores
   const getMedicalTier = (score: number) => {
-    if (score >= 80) return { color: 'hsl(var(--health-green))', badge: 'bg-green-100 text-green-800', text: 'Low Need' };
+    if (score >= 80) return { color: '#0090ff', badge: 'bg-[#f4faff] text-[#123264]', text: 'Low Need' };
     if (score >= 60) return { color: 'hsl(var(--health-yellow))', badge: 'bg-yellow-100 text-yellow-800', text: 'Medium Need' };
     return { color: 'hsl(var(--health-red))', badge: 'bg-red-100 text-red-800', text: 'High Need' };
   };
   
   const getAssetTier = (score: number) => {
-    if (score >= 80) return { color: 'hsl(var(--health-green))', badge: 'bg-green-100 text-green-800', text: 'Excellent Assets' };
+    if (score >= 80) return { color: '#0090ff', badge: 'bg-[#f4faff] text-[#123264]', text: 'Excellent Assets' };
     if (score >= 60) return { color: 'hsl(var(--health-yellow))', badge: 'bg-yellow-100 text-yellow-800', text: 'Strong Assets' };
     return { color: 'hsl(var(--health-red))', badge: 'bg-red-100 text-red-800', text: 'Limited Assets' };
   };
   
   const getBehaviorTier = (score: number) => {
-    if (score >= 80) return { color: 'hsl(var(--health-green))', badge: 'bg-green-100 text-green-800', text: 'Excellent Behavior' };
+    if (score >= 80) return { color: '#0090ff', badge: 'bg-[#f4faff] text-[#123264]', text: 'Excellent Behavior' };
     if (score >= 60) return { color: 'hsl(var(--health-yellow))', badge: 'bg-yellow-100 text-yellow-800', text: 'Good Behavior' };
     return { color: 'hsl(var(--health-red))', badge: 'bg-red-100 text-red-800', text: 'Poor Behavior' };
   };
@@ -103,8 +103,8 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
   const behaviorTier = getBehaviorTier(behaviorScore);
 
   return (
-    <div className="min-h-screen bg-background p-3 sm:p-4 md:p-8">
-      <div className="mx-auto max-w-2xl space-y-4 md:space-y-6">
+    <div className="min-h-screen bg-[#f4faff] p-3 sm:p-4 md:p-8">
+      <div className="mx-auto max-w-7xl space-y-4 md:space-y-6">
         {/* Header */}
         <div className="text-center space-y-4 mb-8">
           <div className="flex flex-col items-center justify-center gap-3">
@@ -120,7 +120,7 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
         </div>
 
         {/* Composite Credit Score */}
-        <Card className="p-5 md:p-7 lg:p-9 bg-gradient-to-br from-primary to-accent border shadow-md rounded-xl">
+        <Card className="p-5 md:p-7 lg:p-9 bg-gradient-to-br from-[#123264] to-[#0090ff] border shadow-md rounded-xl">
           <div className="text-center space-y-4">
             <div>
               <h2 className="text-white text-lg md:text-xl font-semibold mb-1">Your Credit Score</h2>
@@ -128,24 +128,30 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
             </div>
             
             <div className="flex justify-center">
-              <GradientCircularProgress
-                value={overallScore}
-                max={100}
-                size={180}
-                strokeWidth={14}
-                gradientId="scoreGradient"
-                gradientColors={[
-                  { offset: "0%", color: "hsl(45, 93%, 47%)" },
-                  { offset: "60%", color: "hsl(120, 60%, 50%)" },
-                  { offset: "100%", color: "hsl(158, 64%, 52%)" },
-                ]}
-                backgroundColor="rgba(255, 255, 255, 0.2)"
-              >
-                <div className="text-center">
-                  <div className="text-4xl sm:text-5xl md:text-6xl font-bold text-white">{overallScore}</div>
-                  <div className="text-white/70 text-xs sm:text-sm mt-1">/ 100</div>
-                </div>
-              </GradientCircularProgress>
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-full"></div>
+                <div className="absolute inset-2 bg-gradient-to-tl from-[#0090ff]/10 to-transparent rounded-full"></div>
+                <GradientCircularProgress
+                  value={overallScore}
+                  max={100}
+                  size={180}
+                  strokeWidth={8}
+                  gradientId="scoreGradient"
+                  gradientColors={[
+                    { offset: "0%", color: "#ffffff" },
+                    { offset: "100%", color: "#ffffff" },
+                  ]}
+                  backgroundColor="rgba(255, 255, 255, 0.25)"
+                >
+                  <div className="text-center relative">
+                    <div className="absolute inset-0 bg-white/5 rounded-full"></div>
+                    <div className="relative z-10">
+                      <div className="text-4xl sm:text-5xl md:text-6xl font-bold text-white">{overallScore}</div>
+                      <div className="text-white/70 text-xs sm:text-sm mt-1">out of 100</div>
+                    </div>
+                  </div>
+                </GradientCircularProgress>
+              </div>
             </div>
 
             <div className="grid grid-cols-3 gap-2 sm:gap-4 text-white">
@@ -165,179 +171,200 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
           </div>
         </Card>
 
-        {/* Medical Needs */}
-        <Card 
-          className={`p-5 border shadow-sm rounded-xl bg-white ${isAdminMode ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}`}
-          onClick={(e) => {
-            if (isAdminMode) {
-              e.stopPropagation();
-              setSelectedApiData({
-                medicalScore: formData?.medicalScore,
-                medicalAnalysis: formData?.medicalAnalysis
-              });
-              setApiDataTitle("Medical Analysis Data");
-              setShowApiData(true);
-            }
-          }}
-        >
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center">
-            <CircularProgress
-              value={medicalScore}
-              max={100}
-              size={100}
-              strokeWidth={10}
-              color={medicalTier.color}
-              backgroundColor="hsl(var(--muted))"
-            >
-              <div className="text-center">
-                <div className="text-2xl sm:text-3xl font-bold text-foreground">{medicalScore}</div>
-                <div className="text-muted-foreground text-xs">/ 100</div>
-              </div>
-            </CircularProgress>
-
-            <div className="flex-1 space-y-2 sm:space-y-3 text-center sm:text-left w-full">
-              <div className="flex items-center gap-2 justify-center sm:justify-start">
-                <div className="w-8 h-8 rounded-lg bg-health-orange flex items-center justify-center">
-                  <span className="text-white text-xs font-medium">Rx</span>
+        {/* Score Cards Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Medical Needs */}
+          <Card 
+            className={`p-5 border shadow-sm rounded-xl bg-white ${isAdminMode ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}`}
+            onClick={(e) => {
+              if (isAdminMode) {
+                e.stopPropagation();
+                setSelectedApiData({
+                  medicalScore: formData?.medicalScore,
+                  medicalAnalysis: formData?.medicalAnalysis
+                });
+                setApiDataTitle("Medical Analysis Data");
+                setShowApiData(true);
+              }
+            }}
+          >
+            <div className="flex flex-col gap-4 items-center text-center">
+              <CircularProgress
+                value={medicalScore}
+                max={100}
+                size={100}
+                strokeWidth={10}
+                color={medicalTier.color}
+                backgroundColor="hsl(var(--muted))"
+              >
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-foreground">{medicalScore}</div>
+                  <div className="text-muted-foreground text-xs">/ 100</div>
                 </div>
-                <h3 className="text-lg font-semibold text-primary">Medical Assessment</h3>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-y-1.5 sm:gap-y-2 text-xs sm:text-sm">
-                <div className="text-muted-foreground text-left">Annual Cost Est.</div>
-                <div className="font-semibold text-foreground text-right">KSh 450,000</div>
-                <div className="text-muted-foreground text-left">Condition Type</div>
-                <div className="font-semibold text-foreground text-right">Chronic</div>
-                <div className="text-muted-foreground text-left">Refill Frequency</div>
-                <div className="font-semibold text-foreground text-right">90 Days</div>
-              </div>
+              </CircularProgress>
 
-              <div className={`inline-block px-3 sm:px-4 py-1 ${medicalTier.badge} rounded-full text-xs sm:text-sm font-medium`}>
-                {medicalTier.text}
+              <div className="space-y-3 w-full">
+                <div className="flex items-center gap-2 justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-health-orange flex items-center justify-center">
+                    <span className="text-white text-xs font-medium">Rx</span>
+                  </div>
+                  <h3 className="text-lg font-semibold text-primary">Medical Assessment</h3>
+                </div>
+                
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Annual Cost Est.</span>
+                    <span className="font-semibold">KSh 450,000</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Condition Type</span>
+                    <span className="font-semibold">Chronic</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Refill Frequency</span>
+                    <span className="font-semibold">90 Days</span>
+                  </div>
+                </div>
+
+                <div className={`inline-block px-4 py-1 ${medicalTier.badge} rounded-full text-sm font-medium`}>
+                  {medicalTier.text}
+                </div>
               </div>
             </div>
-          </div>
-        </Card>
+          </Card>
 
-        {/* Asset Valuation */}
-        <Card 
-          className={`p-5 border shadow-sm rounded-xl bg-white ${isAdminMode ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}`}
-          onClick={(e) => {
-            if (isAdminMode) {
-              e.stopPropagation();
-              setSelectedApiData({
-                creditEvaluation: formData?.creditEvaluation,
-                assetAnalysis: formData?.assetAnalysis,
-                bankAnalysis: formData?.bankAnalysis,
-                bankScore: formData?.bankScore,
-                mpesaAnalysis: formData?.mpesaAnalysis
-              });
-              setApiDataTitle("Asset & Financial Analysis Data");
-              setShowApiData(true);
-            }
-          }}
-        >
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center">
-            <CircularProgress
-              value={assetScore}
-              max={100}
-              size={100}
-              strokeWidth={10}
-              color={assetTier.color}
-              backgroundColor="hsl(var(--muted))"
-            >
-              <div className="text-center">
-                <div className="text-2xl sm:text-3xl font-bold text-foreground">{assetScore}</div>
-                <div className="text-muted-foreground text-xs">/ 100</div>
-              </div>
-            </CircularProgress>
+          {/* Asset Valuation */}
+          <Card 
+            className={`p-5 border shadow-sm rounded-xl bg-white ${isAdminMode ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}`}
+            onClick={(e) => {
+              if (isAdminMode) {
+                e.stopPropagation();
+                setSelectedApiData({
+                  creditEvaluation: formData?.creditEvaluation,
+                  assetAnalysis: formData?.assetAnalysis,
+                  bankAnalysis: formData?.bankAnalysis,
+                  bankScore: formData?.bankScore,
+                  mpesaAnalysis: formData?.mpesaAnalysis
+                });
+                setApiDataTitle("Asset & Financial Analysis Data");
+                setShowApiData(true);
+              }
+            }}
+          >
+            <div className="flex flex-col gap-4 items-center text-center">
+              <CircularProgress
+                value={assetScore}
+                max={100}
+                size={100}
+                strokeWidth={10}
+                color={assetTier.color}
+                backgroundColor="hsl(var(--muted))"
+              >
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-foreground">{assetScore}</div>
+                  <div className="text-muted-foreground text-xs">/ 100</div>
+                </div>
+              </CircularProgress>
 
-            <div className="flex-1 space-y-2 sm:space-y-3 text-center sm:text-left w-full">
-              <div className="flex items-center gap-2 justify-center sm:justify-start">
-                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                  <span className="text-white text-xs">💰</span>
+              <div className="space-y-3 w-full">
+                <div className="flex items-center gap-2 justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+                    <span className="text-white text-xs">💰</span>
+                  </div>
+                  <h3 className="text-lg font-semibold text-primary">Financial Assets</h3>
                 </div>
-                <h3 className="text-lg font-semibold text-primary">Financial Assets</h3>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-y-1.5 sm:gap-y-2 text-xs sm:text-sm">
-                <div className="text-muted-foreground text-left">Total Assets</div>
-                <div className="font-semibold text-foreground text-right">
-                  KSh {(formData?.assetAnalysis?.analysis_result?.credit_features?.total_asset_value || 
-                       formData?.assetAnalysis?.credit_features?.total_asset_value ||
-                       formData?.assetAnalysis?.analysis_result?.summary?.total_estimated_value || 0).toLocaleString()}
+                
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Total Assets</span>
+                    <span className="font-semibold">
+                      KSh {(formData?.assetAnalysis?.analysis_result?.credit_features?.total_asset_value || 
+                           formData?.assetAnalysis?.credit_features?.total_asset_value ||
+                           formData?.assetAnalysis?.analysis_result?.summary?.total_estimated_value || 0).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Debt-to-Income</span>
+                    <span className="font-semibold">
+                      {formData?.bankAnalysis?.credit_score_ready_values?.features?.withdrawals_opening_ratio 
+                        ? `${(formData.bankAnalysis.credit_score_ready_values.features.withdrawals_opening_ratio * 100).toFixed(1)}%`
+                        : 'N/A'
+                      }
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Monthly Income</span>
+                    <span className="font-semibold">KSh 520,000</span>
+                  </div>
                 </div>
-                <div className="text-muted-foreground text-left">Debt-to-Income</div>
-                <div className="font-semibold text-foreground text-right">
-                  {formData?.bankAnalysis?.credit_score_ready_values?.features?.withdrawals_opening_ratio 
-                    ? `${(formData.bankAnalysis.credit_score_ready_values.features.withdrawals_opening_ratio * 100).toFixed(1)}%`
-                    : 'N/A'
-                  }
-                </div>
-                <div className="text-muted-foreground text-left">Monthly Income</div>
-                <div className="font-semibold text-foreground text-right">KSh 520,000</div>
-              </div>
 
-              <div className={`inline-block px-3 sm:px-4 py-1 ${assetTier.badge} rounded-full text-xs sm:text-sm font-medium`}>
-                {assetTier.text}
+                <div className={`inline-block px-4 py-1 ${assetTier.badge} rounded-full text-sm font-medium`}>
+                  {assetTier.text}
+                </div>
               </div>
             </div>
-          </div>
-        </Card>
+          </Card>
 
-        {/* Behavioral Risk */}
-        <Card 
-          className={`p-5 border shadow-sm rounded-xl bg-white ${isAdminMode ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}`}
-          onClick={(e) => {
-            if (isAdminMode) {
-              e.stopPropagation();
-              setSelectedApiData({
-                callLogsAnalysis: formData?.callLogsAnalysis,
-                behaviorAnalysis: formData?.behaviorAnalysis
-              });
-              setApiDataTitle("Behavioral Risk Analysis Data");
-              setShowApiData(true);
-            }
-          }}
-        >
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center">
-            <CircularProgress
-              value={behaviorScore}
-              max={100}
-              size={100}
-              strokeWidth={10}
-              color={behaviorTier.color}
-              backgroundColor="hsl(var(--muted))"
-            >
-              <div className="text-center">
-                <div className="text-2xl sm:text-3xl font-bold text-foreground">{behaviorScore}</div>
-                <div className="text-muted-foreground text-xs">/ 100</div>
-              </div>
-            </CircularProgress>
-
-            <div className="flex-1 space-y-2 sm:space-y-3 text-center sm:text-left w-full">
-              <div className="flex items-center gap-2 justify-center sm:justify-start">
-                <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
-                  <span className="text-white text-xs">📈</span>
+          {/* Behavioral Risk */}
+          <Card 
+            className={`p-5 border shadow-sm rounded-xl bg-white ${isAdminMode ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}`}
+            onClick={(e) => {
+              if (isAdminMode) {
+                e.stopPropagation();
+                setSelectedApiData({
+                  callLogsAnalysis: formData?.callLogsAnalysis,
+                  behaviorAnalysis: formData?.behaviorAnalysis
+                });
+                setApiDataTitle("Behavioral Risk Analysis Data");
+                setShowApiData(true);
+              }
+            }}
+          >
+            <div className="flex flex-col gap-4 items-center text-center">
+              <CircularProgress
+                value={behaviorScore}
+                max={100}
+                size={100}
+                strokeWidth={10}
+                color={behaviorTier.color}
+                backgroundColor="hsl(var(--muted))"
+              >
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-foreground">{behaviorScore}</div>
+                  <div className="text-muted-foreground text-xs">/ 100</div>
                 </div>
-                <h3 className="text-lg font-semibold text-primary">Behavioral Analysis</h3>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-y-1.5 sm:gap-y-2 text-xs sm:text-sm">
-                <div className="text-muted-foreground text-left">Payment History</div>
-                <div className="font-semibold text-foreground text-right">96%</div>
-                <div className="text-muted-foreground text-left">Green Flags</div>
-                <div className="font-semibold text-health-green text-right">4</div>
-                <div className="text-muted-foreground text-left">Red Flags</div>
-                <div className="font-semibold text-health-red text-right">1</div>
-              </div>
+              </CircularProgress>
 
-              <div className={`inline-block px-3 sm:px-4 py-1 ${behaviorTier.badge} rounded-full text-xs sm:text-sm font-medium`}>
-                {behaviorTier.text}
+              <div className="space-y-3 w-full">
+                <div className="flex items-center gap-2 justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
+                    <span className="text-white text-xs">📈</span>
+                  </div>
+                  <h3 className="text-lg font-semibold text-primary">Behavioral Analysis</h3>
+                </div>
+                
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Payment History</span>
+                    <span className="font-semibold">96%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Green Flags</span>
+                    <span className="font-semibold text-[#0090ff]">4</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Red Flags</span>
+                    <span className="font-semibold text-health-red">1</span>
+                  </div>
+                </div>
+
+                <div className={`inline-block px-4 py-1 ${behaviorTier.badge} rounded-full text-sm font-medium`}>
+                  {behaviorTier.text}
+                </div>
               </div>
             </div>
-          </div>
-        </Card>
+          </Card>
+        </div>
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">

@@ -134,30 +134,38 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
   };
 
   return (
-    <Card className="p-6 md:p-8">
+    <div className="max-w-4xl mx-auto">
+      <Card className="p-6 md:p-8">
       {/* Score Section */}
-      <Card className="mb-6 p-6 bg-tier-background border shadow-md">
-        <div className="text-center space-y-4">
+      <Card className="mb-6 p-4 sm:p-6 bg-gradient-to-br from-[#123264] to-[#0090ff] border shadow-md">
+        <div className="text-center space-y-3 sm:space-y-4">
           <h3 className="text-white text-lg font-semibold tracking-wide">COMPOSITE CREDIT SCORE</h3>
           
           <div className="flex justify-center">
-            <GradientCircularProgress
-              value={overallScore}
-              max={100}
-              size={140}
-              strokeWidth={12}
-              gradientId="compositeScoreGradient"
-              gradientColors={[
-                { offset: "0%", color: "hsl(var(--primary))" },
-                { offset: "100%", color: "hsl(var(--primary))" },
-              ]}
-              backgroundColor="rgba(255, 255, 255, 0.2)"
-            >
-              <div className="text-center">
-                <div className="text-4xl font-bold text-white">{overallScore}</div>
-                <div className="text-white/70 text-sm mt-1">/ 100</div>
-              </div>
-            </GradientCircularProgress>
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-full"></div>
+              <div className="absolute inset-2 bg-gradient-to-tl from-[#0090ff]/10 to-transparent rounded-full"></div>
+              <GradientCircularProgress
+                value={overallScore}
+                max={100}
+                size={140}
+                strokeWidth={8}
+                gradientId="compositeScoreGradient"
+                gradientColors={[
+                  { offset: "0%", color: "#ffffff" },
+                  { offset: "100%", color: "#ffffff" },
+                ]}
+                backgroundColor="rgba(255, 255, 255, 0.25)"
+              >
+                <div className="text-center relative">
+                  <div className="absolute inset-0 bg-white/5 rounded-full"></div>
+                  <div className="relative z-10">
+                    <div className="text-4xl sm:text-5xl font-bold text-white">{overallScore}</div>
+                    <div className="text-white/70 text-xs sm:text-sm mt-1">out of 100</div>
+                  </div>
+                </div>
+              </GradientCircularProgress>
+            </div>
           </div>
 
           <div className="grid grid-cols-3 gap-4 text-white text-sm">
@@ -200,18 +208,35 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
           </div>
 
           <div>
-            <Label htmlFor="age">Age *</Label>
-            <Input
-              id="age"
-              type="number"
-              placeholder="Enter your age"
-              value={formData.age}
-              onChange={(e) => updateFormData({ age: e.target.value })}
-              onFocus={() => trackFieldChange?.('age')}
-              className="mt-2"
-              min="18"
-              max="120"
-            />
+            <Label htmlFor="yearOfBirth">Year of Birth *</Label>
+            <Select
+              value={formData.yearOfBirth}
+              onValueChange={(value) => {
+                const currentYear = new Date().getFullYear();
+                const calculatedAge = (currentYear - parseInt(value)).toString();
+                updateFormData({ yearOfBirth: value, age: calculatedAge });
+              }}
+              onOpenChange={(open) => open && trackFieldChange?.('yearOfBirth')}
+            >
+              <SelectTrigger className="mt-2">
+                <SelectValue placeholder="Select year of birth" />
+              </SelectTrigger>
+              <SelectContent>
+                {Array.from({ length: 2025 - 1900 + 1 }, (_, i) => {
+                  const year = 2025 - i;
+                  return (
+                    <SelectItem key={year} value={year.toString()}>
+                      {year}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+            {formData.yearOfBirth && (
+              <p className="text-sm text-muted-foreground mt-1">
+                Age: {formData.age} years old
+              </p>
+            )}
           </div>
         </div>
 
@@ -229,7 +254,7 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
                   <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded-lg transition-all duration-200"></div>
                 </div>
               ))}
-              <label className="w-16 h-16 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-primary hover:bg-gray-50 transition-all duration-200 shadow-sm">
+              <label className="w-16 h-16 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-primary hover:bg-[#f4faff] transition-all duration-200 shadow-sm">
                 <span className="text-2xl text-gray-400 font-light">+</span>
                 <Input
                   type="file"
@@ -270,7 +295,7 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
                 />
               </label>
             </div>
-            <p className="text-xs text-green-600 font-medium mt-1">
+            <p className="text-xs text-[#60646b] font-medium mt-1">
               📋 Take a picture of your medical prescription
             </p>
           </div>
@@ -290,7 +315,7 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
                   <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded-lg transition-all duration-200"></div>
                 </div>
               ))}
-              <label className="w-16 h-16 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-primary hover:bg-gray-50 transition-all duration-200 shadow-sm">
+              <label className="w-16 h-16 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-primary hover:bg-[#f4faff] transition-all duration-200 shadow-sm">
                 <span className="text-2xl text-gray-400 font-light">+</span>
                 <Input
                   type="file"
@@ -364,7 +389,7 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
                 />
               </label>
             </div>
-            <p className="text-xs text-purple-600 font-medium mt-1">
+            <p className="text-xs text-[#60646b] font-medium mt-1">
               💊 Take a picture of your drugs/medicines
             </p>
           </div>
@@ -401,5 +426,6 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
         </div>
       </div>
     </Card>
+    </div>
   );
 };

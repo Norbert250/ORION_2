@@ -22,7 +22,7 @@
     --muted: 200 15% 96%;
     --muted-foreground: 220 7% 39%; /* #60646b */
 
-    --accent: 160 100% 35%; /* Medical Teal */
+    --accent: 210 100% 50%; /* #0090ff */
     --accent-foreground: 0 0% 100%;
 
     --destructive: 356 78% 54%; /* #E42D35 */
@@ -30,18 +30,18 @@
 
     --border: 220 15% 84%; /* #D3D8DE */
     --input: 220 15% 84%;
-    --ring: 204 94% 54%;
+    --ring: 210 100% 50%; /* #0090ff */
 
     --radius: 1rem;
     
     --health-orange: 28 100% 50%;
     --health-yellow: 45 93% 47%;
-    --health-green: 160 100% 35%;
+    --health-green: 210 100% 50%; /* #0090ff */
     --health-red: 0 84% 60%;
-    --medical-blue: 200 100% 40%;
-    --medical-teal: 160 100% 35%;
+    --medical-blue: 210 100% 50%; /* #0090ff */
+    --medical-teal: 210 100% 50%; /* #0090ff */
     --medical-light: 200 20% 98%;
-    --medical-dark: 200 100% 25%;
+    --medical-dark: 220 65% 24%; /* #123264 */
     --tier-background: 220 65% 24%; /* #123264 */
     
     --gradient-purple: linear-gradient(135deg, hsl(250 60% 60%) 0%, hsl(270 50% 50%) 100%);
@@ -84,7 +84,7 @@
 
     --border: 210 65% 25%;
     --input: 210 65% 25%;
-    --ring: 204 94% 54%;
+    --ring: 210 100% 50%; /* #0090ff */
 
     --sidebar-background: 210 65% 20%;
     --sidebar-foreground: 0 0% 100%;

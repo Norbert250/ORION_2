@@ -98,30 +98,37 @@ export const StepFive = ({ formData, prevStep, handleSubmit }: StepFiveProps) =>
   const overallScore = Math.round(((medicalScore || 0) + (assetScore || 0) + (behaviorScore || 0)) / 3);
 
   return (
-    <Card className="p-4 sm:p-6 md:p-8">
-      <div className="mb-6 p-6 bg-gradient-to-br from-primary to-accent rounded-lg">
+    <div className="max-w-4xl mx-auto">
+      <Card className="p-4 sm:p-6 md:p-8">
+      <div className="mb-6 p-6 bg-gradient-to-br from-[#123264] to-[#0090ff] rounded-lg">
         <div className="text-center space-y-4">
           <h3 className="text-white text-lg font-semibold tracking-wide">COMPOSITE CREDIT SCORE</h3>
           
           <div className="flex justify-center">
-            <GradientCircularProgress
-              value={overallScore}
-              max={100}
-              size={140}
-              strokeWidth={12}
-              gradientId="reviewScoreGradient"
-              gradientColors={[
-                { offset: "0%", color: "hsl(45, 93%, 47%)" },
-                { offset: "60%", color: "hsl(120, 60%, 50%)" },
-                { offset: "100%", color: "hsl(158, 64%, 52%)" },
-              ]}
-              backgroundColor="rgba(255, 255, 255, 0.2)"
-            >
-              <div className="text-center">
-                <div className="text-4xl font-bold text-white">{overallScore}</div>
-                <div className="text-white/70 text-sm mt-1">/ 100</div>
-              </div>
-            </GradientCircularProgress>
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-full"></div>
+              <div className="absolute inset-2 bg-gradient-to-tl from-[#0090ff]/10 to-transparent rounded-full"></div>
+              <GradientCircularProgress
+                value={overallScore}
+                max={100}
+                size={140}
+                strokeWidth={8}
+                gradientId="reviewScoreGradient"
+                gradientColors={[
+                  { offset: "0%", color: "#ffffff" },
+                  { offset: "100%", color: "#ffffff" },
+                ]}
+                backgroundColor="rgba(255, 255, 255, 0.25)"
+              >
+                <div className="text-center relative">
+                  <div className="absolute inset-0 bg-white/5 rounded-full"></div>
+                  <div className="relative z-10">
+                    <div className="text-4xl sm:text-5xl font-bold text-white">{overallScore}</div>
+                    <div className="text-white/70 text-xs sm:text-sm mt-1">out of 100</div>
+                  </div>
+                </div>
+              </GradientCircularProgress>
+            </div>
           </div>
 
           <div className="grid grid-cols-3 gap-4 text-white text-sm">
@@ -277,5 +284,6 @@ export const StepFive = ({ formData, prevStep, handleSubmit }: StepFiveProps) =>
         </div>
       </div>
     </Card>
+    </div>
   );
 };
