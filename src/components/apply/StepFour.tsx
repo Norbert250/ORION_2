@@ -237,12 +237,18 @@ export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFi
                   className="cursor-pointer"
                 />
                 {formData.guarantor1Id && (
-                  <div className="mt-2">
+                  <div className="mt-2 relative inline-block">
                     <img
                       src={URL.createObjectURL(formData.guarantor1Id)}
                       alt="Guarantor 1 ID"
                       className="w-24 h-16 object-cover rounded border mb-2"
                     />
+                    <button
+                      onClick={() => updateFormData({ guarantor1Id: null })}
+                      className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center"
+                    >
+                      ×
+                    </button>
                     <p className="text-sm text-muted-foreground">
                       {formData.guarantor1Id.name}
                     </p>
@@ -301,12 +307,18 @@ export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFi
                   className="cursor-pointer"
                 />
                 {formData.guarantor2Id && (
-                  <div className="mt-2">
+                  <div className="mt-2 relative inline-block">
                     <img
                       src={URL.createObjectURL(formData.guarantor2Id)}
                       alt="Guarantor 2 ID"
                       className="w-24 h-16 object-cover rounded border mb-2"
                     />
+                    <button
+                      onClick={() => updateFormData({ guarantor2Id: null })}
+                      className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center"
+                    >
+                      ×
+                    </button>
                     <p className="text-sm text-muted-foreground">
                       {formData.guarantor2Id.name}
                     </p>

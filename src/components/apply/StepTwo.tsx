@@ -251,7 +251,15 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
                     alt={`Prescription ${index + 1}`}
                     className="w-full h-full object-cover rounded-lg border-2 border-gray-200 shadow-sm"
                   />
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded-lg transition-all duration-200"></div>
+                  <button
+                    onClick={() => {
+                      const newFiles = formData.medicalPrescription.filter((_, i) => i !== index);
+                      updateFormData({ medicalPrescription: newFiles });
+                    }}
+                    className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    ×
+                  </button>
                 </div>
               ))}
               <label className="w-16 h-16 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-primary hover:bg-[#f4faff] transition-all duration-200 shadow-sm">
@@ -312,7 +320,15 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
                     alt={`Drug ${index + 1}`}
                     className="w-full h-full object-cover rounded-lg border-2 border-gray-200 shadow-sm"
                   />
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded-lg transition-all duration-200"></div>
+                  <button
+                    onClick={() => {
+                      const newFiles = formData.drugImage.filter((_, i) => i !== index);
+                      updateFormData({ drugImage: newFiles });
+                    }}
+                    className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    ×
+                  </button>
                 </div>
               ))}
               <label className="w-16 h-16 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center cursor-pointer hover:border-primary hover:bg-[#f4faff] transition-all duration-200 shadow-sm">
