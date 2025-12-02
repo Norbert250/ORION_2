@@ -16,7 +16,7 @@ interface StepOneProps {
 
 export const StepOne = ({ formData, updateFormData, nextStep, trackFieldChange }: StepOneProps) => {
   const handleNext = () => {
-    if (formData.phoneNumber && formData.workType) {
+    if (formData.phoneNumber && formData.sector && formData.workType) {
       nextStep();
     } else {
       alert("Please fill in all required fields");
@@ -42,17 +42,37 @@ export const StepOne = ({ formData, updateFormData, nextStep, trackFieldChange }
         </div>
 
         <div>
+          <Label htmlFor="employmentType">Employment Type *</Label>
+          <Select
+            value={formData.sector}
+            onValueChange={(value) => {
+              updateFormData({ sector: value, workType: "" });
+            }}
+            onOpenChange={(open) => open && trackFieldChange?.('employmentType')}
+          >
+            <SelectTrigger className="mt-2">
+              <SelectValue placeholder="Select employment type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="employed">Employed</SelectItem>
+              <SelectItem value="selfemployed">Self-employed</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
           <Label htmlFor="workType">Select the type of your work *</Label>
           <Select
             value={formData.workType}
             onValueChange={(value) => updateFormData({ workType: value })}
             onOpenChange={(open) => open && trackFieldChange?.('workType')}
+            disabled={!formData.sector}
           >
             <SelectTrigger className="mt-2">
-              <SelectValue placeholder="Select your work type" />
+              <SelectValue placeholder={formData.sector ? "Select your work type" : "Select employment type first"} />
             </SelectTrigger>
             <SelectContent>
-              {formData.sector === 'formal' ? (
+              {formData.sector === 'employed' ? (
                 <>
                   <SelectItem value="Nurses">Nurses</SelectItem>
                   <SelectItem value="Bank Tellers">Bank Tellers</SelectItem>
@@ -61,7 +81,7 @@ export const StepOne = ({ formData, updateFormData, nextStep, trackFieldChange }
                   <SelectItem value="Police Officers">Police Officers</SelectItem>
                   <SelectItem value="Civil Engineers">Civil Engineers</SelectItem>
                 </>
-              ) : (
+              ) : formData.sector === 'selfemployed' ? (
                 <>
                   <SelectItem value="Farmers and livestocks">Farmers and livestocks</SelectItem>
                   <SelectItem value="Construction workers">Construction workers</SelectItem>
@@ -74,7 +94,7 @@ export const StepOne = ({ formData, updateFormData, nextStep, trackFieldChange }
                   <SelectItem value="Mechanicians">Mechanicians</SelectItem>
                   <SelectItem value="Hair dressers">Hair dressers</SelectItem>
                 </>
-              )}
+              ) : null}
             </SelectContent>
           </Select>
         </div>

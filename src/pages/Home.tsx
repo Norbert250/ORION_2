@@ -20,21 +20,7 @@ const Home = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const [showSectorModal, setShowSectorModal] = useState(true);
-  const [selectedSector, setSelectedSector] = useState<'formal' | 'informal' | null>(null);
-  const [selectedWorkType, setSelectedWorkType] = useState('');
 
-  const handleSectorSelect = (sector: 'formal' | 'informal') => {
-    setSelectedSector(sector);
-    setSelectedWorkType('');
-  };
-
-  const handleContinue = () => {
-    if (selectedSector) {
-      setShowSectorModal(false);
-      navigate('/apply', { state: { sector: selectedSector } });
-    }
-  };
 
   return (
     <div className="min-h-screen" style={{background: '#EDF7FF'}}>
@@ -60,7 +46,7 @@ const Home = () => {
                   <Button variant="ghost" className="text-nav-inactive hover:text-white hover:bg-nav-active" onClick={() => navigate("/auth")}>
                     Sign In
                   </Button>
-                  <Button className="bg-light-blue hover:brightness-95" onClick={() => setShowSectorModal(true)}>
+                  <Button className="bg-light-blue hover:brightness-95" onClick={() => navigate('/apply')}>
                     Apply Now
                   </Button>
                 </>
@@ -106,7 +92,7 @@ const Home = () => {
                     <Button
                       className="w-full bg-light-blue hover:brightness-95"
                       onClick={() => {
-                        setShowSectorModal(true);
+                        navigate('/apply');
                         setShowMobileMenu(false);
                       }}
                     >
@@ -158,7 +144,7 @@ const Home = () => {
                 <Button
                   size="lg"
                   className="text-base sm:text-lg lg:text-xl px-6 sm:px-8 lg:px-12 py-6 sm:py-8 h-auto flex items-center justify-center w-full sm:flex-1 bg-primary hover:brightness-95"
-                  onClick={() => setShowSectorModal(true)}
+                  onClick={() => navigate('/apply')}
                 >
                   Apply for New Loan
                   <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 ml-2" />
@@ -187,7 +173,7 @@ const Home = () => {
                 <Button
                   size="lg"
                   className="text-base sm:text-lg lg:text-xl px-6 sm:px-8 lg:px-12 py-6 sm:py-8 h-auto flex items-center justify-center w-full sm:flex-1 bg-primary hover:brightness-95"
-                  onClick={() => setShowSectorModal(true)}
+                  onClick={() => navigate('/apply')}
                 >
                   Apply for Loan
                   <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 ml-2" />
@@ -293,86 +279,7 @@ const Home = () => {
         </div>
       </footer>
 
-      {/* Employment Type Modal */}
-      {showSectorModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-          <Card className="max-w-md w-full p-6 animate-scale-in max-h-[90vh] overflow-y-auto shadow-xl">
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                <Activity className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-foreground mb-2">Choose Your Employment Type</h3>
-              <p className="text-muted-foreground text-sm">This helps us customize your application process</p>
-            </div>
 
-            <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6 lg:mb-8">
-              <button
-                onClick={() => handleSectorSelect('formal')}
-                className={`w-full p-4 text-left border-2 rounded-lg transition-all duration-300 group ${
-                  selectedSector === 'formal' 
-                    ? 'border-primary bg-primary/5' 
-                    : 'border-border hover:border-primary hover:bg-primary/5'
-                }`}
-              >
-                <div className="flex items-start gap-3 sm:gap-4">
-                  <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0">
-                    <Activity className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-foreground mb-1">Employed/Salaried</div>
-                    <div className="text-sm text-muted-foreground">
-                      Regular job with salary, bank statements, and payslips available
-                    </div>
-                  </div>
-                </div>
-              </button>
-
-              <button
-                onClick={() => handleSectorSelect('informal')}
-                className={`w-full p-4 text-left border-2 rounded-lg transition-all duration-300 group ${
-                  selectedSector === 'informal' 
-                    ? 'border-accent bg-accent/5' 
-                    : 'border-border hover:border-accent hover:bg-accent/5'
-                }`}
-              >
-                <div className="flex items-start gap-3 sm:gap-4">
-                  <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0">
-                    <Users className="w-5 h-5 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-foreground mb-1">Self-Employed/Freelance</div>
-                    <div className="text-sm text-muted-foreground">
-                      Own business, freelance work, or irregular income
-                    </div>
-                  </div>
-                </div>
-              </button>
-
-
-            </div>
-
-            <div className="flex gap-3">
-              <Button
-  variant="ghost"
-  className="flex-1"
-  onClick={() => {
-    window.location.href = "https://checkupsmed.com";
-  }}
->
-  Cancel
-</Button>
-
-              <Button
-                className="flex-1"
-                disabled={!selectedSector}
-                onClick={handleContinue}
-              >
-                Continue
-              </Button>
-            </div>
-          </Card>
-        </div>
-      )}
     </div>
   );
 };

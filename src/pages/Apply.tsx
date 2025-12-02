@@ -17,7 +17,7 @@ const Apply = () => {
   const [formData, setFormData] = useState<ApplicationFormData>({
     phoneNumber: "",
     occupation: "",
-    sector: location.state?.sector || "",
+    sector: "",
     workType: "",
     sex: "",
     age: "",
