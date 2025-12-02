@@ -237,21 +237,42 @@ export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFi
                   className="cursor-pointer"
                 />
                 {formData.guarantor1Id && (
-                  <div className="mt-2 relative inline-block">
-                    <img
-                      src={URL.createObjectURL(formData.guarantor1Id)}
-                      alt="Guarantor 1 ID"
-                      className="w-24 h-16 object-cover rounded border mb-2"
-                    />
-                    <button
-                      onClick={() => updateFormData({ guarantor1Id: null })}
-                      className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center"
-                    >
-                      ×
-                    </button>
-                    <p className="text-sm text-muted-foreground">
+                  <div className="mt-2">
+                    <div className="relative inline-block">
+                      <img
+                        src={URL.createObjectURL(formData.guarantor1Id)}
+                        alt="Guarantor 1 ID"
+                        className="w-24 h-16 object-cover rounded border mb-2"
+                      />
+                      <button
+                        onClick={() => updateFormData({ guarantor1Id: null, guarantor1IdAnalysis: null })}
+                        className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center"
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-2">
                       {formData.guarantor1Id.name}
                     </p>
+                    {formData.guarantor1IdAnalysis?.fields && (
+                      <div className="bg-[#f4faff] p-3 rounded-lg text-sm">
+                        <h4 className="font-semibold text-[#123264] mb-2">Extracted Information:</h4>
+                        <div className="space-y-1">
+                          {formData.guarantor1IdAnalysis.fields.FullName && (
+                            <p><span className="font-medium">Name:</span> {formData.guarantor1IdAnalysis.fields.FullName}</p>
+                          )}
+                          {formData.guarantor1IdAnalysis.fields.IDNumber && (
+                            <p><span className="font-medium">ID Number:</span> {formData.guarantor1IdAnalysis.fields.IDNumber}</p>
+                          )}
+                          {formData.guarantor1IdAnalysis.fields.Nationality && (
+                            <p><span className="font-medium">Nationality:</span> {formData.guarantor1IdAnalysis.fields.Nationality}</p>
+                          )}
+                          {formData.guarantor1IdAnalysis.fields.PassportNumber && (
+                            <p><span className="font-medium">Passport:</span> {formData.guarantor1IdAnalysis.fields.PassportNumber}</p>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -307,21 +328,42 @@ export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFi
                   className="cursor-pointer"
                 />
                 {formData.guarantor2Id && (
-                  <div className="mt-2 relative inline-block">
-                    <img
-                      src={URL.createObjectURL(formData.guarantor2Id)}
-                      alt="Guarantor 2 ID"
-                      className="w-24 h-16 object-cover rounded border mb-2"
-                    />
-                    <button
-                      onClick={() => updateFormData({ guarantor2Id: null })}
-                      className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center"
-                    >
-                      ×
-                    </button>
-                    <p className="text-sm text-muted-foreground">
+                  <div className="mt-2">
+                    <div className="relative inline-block">
+                      <img
+                        src={URL.createObjectURL(formData.guarantor2Id)}
+                        alt="Guarantor 2 ID"
+                        className="w-24 h-16 object-cover rounded border mb-2"
+                      />
+                      <button
+                        onClick={() => updateFormData({ guarantor2Id: null, guarantor2IdAnalysis: null })}
+                        className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center"
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-2">
                       {formData.guarantor2Id.name}
                     </p>
+                    {formData.guarantor2IdAnalysis?.fields && (
+                      <div className="bg-[#f4faff] p-3 rounded-lg text-sm">
+                        <h4 className="font-semibold text-[#123264] mb-2">Extracted Information:</h4>
+                        <div className="space-y-1">
+                          {formData.guarantor2IdAnalysis.fields.FullName && (
+                            <p><span className="font-medium">Name:</span> {formData.guarantor2IdAnalysis.fields.FullName}</p>
+                          )}
+                          {formData.guarantor2IdAnalysis.fields.IDNumber && (
+                            <p><span className="font-medium">ID Number:</span> {formData.guarantor2IdAnalysis.fields.IDNumber}</p>
+                          )}
+                          {formData.guarantor2IdAnalysis.fields.Nationality && (
+                            <p><span className="font-medium">Nationality:</span> {formData.guarantor2IdAnalysis.fields.Nationality}</p>
+                          )}
+                          {formData.guarantor2IdAnalysis.fields.PassportNumber && (
+                            <p><span className="font-medium">Passport:</span> {formData.guarantor2IdAnalysis.fields.PassportNumber}</p>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
