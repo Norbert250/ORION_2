@@ -224,15 +224,7 @@ export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFi
                         const guarantor1IdAnalysis = await analyzeId(file);
                         console.log('✅ Guarantor 1 ID analysis complete:', guarantor1IdAnalysis);
                         
-                        // Add 3 points to current behavior score
-                        const currentBehaviorScore = formData?.callLogsAnalysis?.credit_score || formData?.callLogsAnalysis?.score || 0;
-                        const guarantor2Bonus = formData?.guarantor2IdAnalysis ? 3 : 0;
-                        const totalBehaviorScore = { credit_score: currentBehaviorScore + 3 + guarantor2Bonus, score: currentBehaviorScore + 3 + guarantor2Bonus };
-                        
-                        updateFormData({ 
-                          guarantor1IdAnalysis, 
-                          callLogsAnalysis: totalBehaviorScore 
-                        });
+                        updateFormData({ guarantor1IdAnalysis });
                       } catch (error) {
                         console.error('❌ Guarantor 1 ID analysis error:', error);
                       } finally {
@@ -296,15 +288,7 @@ export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFi
                         const guarantor2IdAnalysis = await analyzeId(file);
                         console.log('✅ Guarantor 2 ID analysis complete:', guarantor2IdAnalysis);
                         
-                        // Add 3 points to current behavior score
-                        const currentBehaviorScore = formData?.callLogsAnalysis?.credit_score || formData?.callLogsAnalysis?.score || 0;
-                        const guarantor1Bonus = formData?.guarantor1IdAnalysis ? 3 : 0;
-                        const totalBehaviorScore = { credit_score: currentBehaviorScore + 3 + guarantor1Bonus, score: currentBehaviorScore + 3 + guarantor1Bonus };
-                        
-                        updateFormData({ 
-                          guarantor2IdAnalysis, 
-                          callLogsAnalysis: totalBehaviorScore 
-                        });
+                        updateFormData({ guarantor2IdAnalysis });
                       } catch (error) {
                         console.error('❌ Guarantor 2 ID analysis error:', error);
                       } finally {

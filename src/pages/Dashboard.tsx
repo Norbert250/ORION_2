@@ -47,10 +47,12 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
   
   // Determine risk level
   const getRiskLevel = (score: number) => {
-    if (score >= 80) return 'EXCELLENT';
+    if (score >= 90) return 'EXCELLENT';
+    if (score >= 80) return 'VERY GOOD';
     if (score >= 70) return 'GOOD';
     if (score >= 60) return 'FAIR';
-    return 'POOR';
+    if (score >= 40) return 'POOR';
+    return 'HIGH RISK';
   };
   
   const getCreditLimit = (score: number) => {
@@ -81,21 +83,27 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
   
   // Tier functions based on scores
   const getMedicalTier = (score: number) => {
-    if (score >= 80) return { color: '#0090ff', badge: 'bg-[#f4faff] text-[#123264]', text: 'Low Need' };
-    if (score >= 60) return { color: 'hsl(var(--health-yellow))', badge: 'bg-yellow-100 text-yellow-800', text: 'Medium Need' };
-    return { color: 'hsl(var(--health-red))', badge: 'bg-red-100 text-red-800', text: 'High Need' };
+    if (score >= 90) return { color: '#dc2626', badge: 'bg-red-600 text-white', text: 'Critical Need' };
+    if (score >= 75) return { color: '#ef4444', badge: 'bg-red-100 text-red-800', text: 'High Need' };
+    if (score >= 60) return { color: '#f59e0b', badge: 'bg-yellow-100 text-yellow-800', text: 'Medium Need' };
+    if (score >= 40) return { color: '#10b981', badge: 'bg-green-100 text-green-800', text: 'Low Need' };
+    return { color: '#0090ff', badge: 'bg-[#f4faff] text-[#123264]', text: 'Minimal Need' };
   };
   
   const getAssetTier = (score: number) => {
-    if (score >= 80) return { color: '#0090ff', badge: 'bg-[#f4faff] text-[#123264]', text: 'Excellent Assets' };
-    if (score >= 60) return { color: 'hsl(var(--health-yellow))', badge: 'bg-yellow-100 text-yellow-800', text: 'Strong Assets' };
-    return { color: 'hsl(var(--health-red))', badge: 'bg-red-100 text-red-800', text: 'Limited Assets' };
+    if (score >= 90) return { color: '#0090ff', badge: 'bg-blue-600 text-white', text: 'Premium Assets' };
+    if (score >= 75) return { color: '#3b82f6', badge: 'bg-[#f4faff] text-[#123264]', text: 'Excellent Assets' };
+    if (score >= 60) return { color: '#10b981', badge: 'bg-green-100 text-green-800', text: 'Strong Assets' };
+    if (score >= 40) return { color: '#f59e0b', badge: 'bg-yellow-100 text-yellow-800', text: 'Limited Assets' };
+    return { color: '#ef4444', badge: 'bg-red-100 text-red-800', text: 'Minimal Assets' };
   };
   
   const getBehaviorTier = (score: number) => {
-    if (score >= 80) return { color: '#0090ff', badge: 'bg-[#f4faff] text-[#123264]', text: 'Excellent Behavior' };
-    if (score >= 60) return { color: 'hsl(var(--health-yellow))', badge: 'bg-yellow-100 text-yellow-800', text: 'Good Behavior' };
-    return { color: 'hsl(var(--health-red))', badge: 'bg-red-100 text-red-800', text: 'Poor Behavior' };
+    if (score >= 90) return { color: '#10b981', badge: 'bg-green-600 text-white', text: 'Outstanding Behavior' };
+    if (score >= 75) return { color: '#22c55e', badge: 'bg-green-100 text-green-800', text: 'Excellent Behavior' };
+    if (score >= 60) return { color: '#0090ff', badge: 'bg-[#f4faff] text-[#123264]', text: 'Good Behavior' };
+    if (score >= 40) return { color: '#f59e0b', badge: 'bg-yellow-100 text-yellow-800', text: 'Poor Behavior' };
+    return { color: '#ef4444', badge: 'bg-red-100 text-red-800', text: 'High Risk Behavior' };
   };
   
   const medicalTier = getMedicalTier(medicalScore);
