@@ -269,17 +269,17 @@ export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFi
                       <div className="bg-[#f4faff] p-3 rounded-lg text-sm">
                         <h4 className="font-semibold text-[#123264] mb-2">Extracted Information:</h4>
                         <div className="space-y-1">
-                          {(formData.guarantor1IdAnalysis.fields?.FullName || formData.guarantor1IdAnalysis.FullName) && (
-                            <p><span className="font-medium">Name:</span> {formData.guarantor1IdAnalysis.fields?.FullName || formData.guarantor1IdAnalysis.FullName}</p>
+                          {(formData.guarantor1IdAnalysis.fields?.['Full Name'] || formData.guarantor1IdAnalysis['Full Name']) && (
+                            <p><span className="font-medium">Name:</span> {formData.guarantor1IdAnalysis.fields?.['Full Name'] || formData.guarantor1IdAnalysis['Full Name']}</p>
                           )}
-                          {(formData.guarantor1IdAnalysis.fields?.IDNumber || formData.guarantor1IdAnalysis.IDNumber) && (
-                            <p><span className="font-medium">ID Number:</span> {formData.guarantor1IdAnalysis.fields?.IDNumber || formData.guarantor1IdAnalysis.IDNumber}</p>
+                          {(formData.guarantor1IdAnalysis.fields?.['ID Number'] || formData.guarantor1IdAnalysis['ID Number']) && (
+                            <p><span className="font-medium">ID Number:</span> {formData.guarantor1IdAnalysis.fields?.['ID Number'] || formData.guarantor1IdAnalysis['ID Number']}</p>
                           )}
                           {(formData.guarantor1IdAnalysis.fields?.Nationality || formData.guarantor1IdAnalysis.Nationality) && (
                             <p><span className="font-medium">Nationality:</span> {formData.guarantor1IdAnalysis.fields?.Nationality || formData.guarantor1IdAnalysis.Nationality}</p>
                           )}
-                          {(formData.guarantor1IdAnalysis.fields?.PassportNumber || formData.guarantor1IdAnalysis.PassportNumber) && (
-                            <p><span className="font-medium">Passport:</span> {formData.guarantor1IdAnalysis.fields?.PassportNumber || formData.guarantor1IdAnalysis.PassportNumber}</p>
+                          {(formData.guarantor1IdAnalysis.fields?.['Passport Number'] || formData.guarantor1IdAnalysis['Passport Number']) && (
+                            <p><span className="font-medium">Passport:</span> {formData.guarantor1IdAnalysis.fields?.['Passport Number'] || formData.guarantor1IdAnalysis['Passport Number']}</p>
                           )}
                         </div>
                       </div>
@@ -363,17 +363,17 @@ export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFi
                       <div className="bg-[#f4faff] p-3 rounded-lg text-sm">
                         <h4 className="font-semibold text-[#123264] mb-2">Extracted Information:</h4>
                         <div className="space-y-1">
-                          {(formData.guarantor2IdAnalysis.fields?.FullName || formData.guarantor2IdAnalysis.FullName) && (
-                            <p><span className="font-medium">Name:</span> {formData.guarantor2IdAnalysis.fields?.FullName || formData.guarantor2IdAnalysis.FullName}</p>
+                          {(formData.guarantor2IdAnalysis.fields?.['Full Name'] || formData.guarantor2IdAnalysis['Full Name']) && (
+                            <p><span className="font-medium">Name:</span> {formData.guarantor2IdAnalysis.fields?.['Full Name'] || formData.guarantor2IdAnalysis['Full Name']}</p>
                           )}
-                          {(formData.guarantor2IdAnalysis.fields?.IDNumber || formData.guarantor2IdAnalysis.IDNumber) && (
-                            <p><span className="font-medium">ID Number:</span> {formData.guarantor2IdAnalysis.fields?.IDNumber || formData.guarantor2IdAnalysis.IDNumber}</p>
+                          {(formData.guarantor2IdAnalysis.fields?.['ID Number'] || formData.guarantor2IdAnalysis['ID Number']) && (
+                            <p><span className="font-medium">ID Number:</span> {formData.guarantor2IdAnalysis.fields?.['ID Number'] || formData.guarantor2IdAnalysis['ID Number']}</p>
                           )}
                           {(formData.guarantor2IdAnalysis.fields?.Nationality || formData.guarantor2IdAnalysis.Nationality) && (
                             <p><span className="font-medium">Nationality:</span> {formData.guarantor2IdAnalysis.fields?.Nationality || formData.guarantor2IdAnalysis.Nationality}</p>
                           )}
-                          {(formData.guarantor2IdAnalysis.fields?.PassportNumber || formData.guarantor2IdAnalysis.PassportNumber) && (
-                            <p><span className="font-medium">Passport:</span> {formData.guarantor2IdAnalysis.fields?.PassportNumber || formData.guarantor2IdAnalysis.PassportNumber}</p>
+                          {(formData.guarantor2IdAnalysis.fields?.['Passport Number'] || formData.guarantor2IdAnalysis['Passport Number']) && (
+                            <p><span className="font-medium">Passport:</span> {formData.guarantor2IdAnalysis.fields?.['Passport Number'] || formData.guarantor2IdAnalysis['Passport Number']}</p>
                           )}
                         </div>
                       </div>
