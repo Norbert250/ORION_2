@@ -23,8 +23,10 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
   const [loadingMessage, setLoadingMessage] = useState('');
   
   // Calculate real-time scores from API responses
-  const medicalScore = formData?.medicalScore?.scoring?.total_score || 
-                      formData?.medicalScore?.score || 0;
+  const baseMedicalScore = formData?.medicalScore?.scoring?.total_score || 
+                          formData?.medicalScore?.score || 0;
+  const prescriptionBonus = formData?.prescriptionAnalysis ? 3 : 0;
+  const medicalScore = baseMedicalScore + prescriptionBonus;
   
   const assetScore = formData?.creditEvaluation?.credit_score || 0;
   
@@ -282,13 +284,8 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
                         const prescriptionResult = await analyzeFiles(allFiles, '/prescriptions/analyze');
                         console.log('✅ Prescription analysis complete:', prescriptionResult);
                         
-                        // Add 3 points to current medical score
-                        const currentMedicalScore = formData?.medicalScore?.scoring?.total_score || formData?.medicalScore?.score || 0;
-                        const bonusScore = { score: currentMedicalScore + 3, scoring: { total_score: currentMedicalScore + 3 } };
-                        
                         updateFormData({ 
-                          prescriptionAnalysis: prescriptionResult,
-                          medicalScore: bonusScore
+                          prescriptionAnalysis: prescriptionResult
                         });
                       } catch (error) {
                         console.error('❌ Prescription analysis error:', error);
@@ -361,25 +358,9 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
                             const medicalScore = await scoreMedical(medicalNeedsResult.predicted_conditions);
                             console.log('✅ Medical scoring complete:', medicalScore);
                             
-                            // Medical score = API score + prescription bonus
-                            const apiScore = medicalScore.score || medicalScore.scoring?.total_score || 0;
-                            const prescriptionBonus = formData?.prescriptionAnalysis ? 3 : 0;
-                            const totalScore = apiScore + prescriptionBonus;
-                            
-                            const totalMedicalScore = {
-                              ...medicalScore,
-                              score: totalScore,
-                              scoring: {
-                                ...medicalScore.scoring,
-                                total_score: totalScore
-                              }
-                            };
-                            
-                            console.log('✅ Total medical score with prescription bonus:', totalMedicalScore);
-                            
                             updateFormData({ 
                               medicalAnalysis: medicalNeedsResult, 
-                              medicalScore: totalMedicalScore
+                              medicalScore: medicalScore
                             });
                           } catch (scoringError) {
                             console.error('❌ Medical scoring failed:', scoringError);
@@ -425,12 +406,12 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
             type="button"
             onClick={handleNext}
             disabled={isLoading}
-            className="flex-1 bg-primary hover:bg-primary/90"
+            className="flex-1 bg-primary hover:bg-primary/90 min-w-0"
           >
             {isLoading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {loadingMessage}
+                <Loader2 className="mr-2 h-4 w-4 animate-spin flex-shrink-0" />
+                <span className="truncate">{loadingMessage}</span>
               </>
             ) : (
               <>

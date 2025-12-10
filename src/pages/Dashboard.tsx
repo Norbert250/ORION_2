@@ -23,8 +23,10 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
   const [apiDataTitle, setApiDataTitle] = useState("");
   
   // Calculate dynamic scores from API responses (same as Steps 3, 4 & 5)
-  const medicalScore = formData?.medicalScore?.scoring?.total_score || 
-                      formData?.medicalScore?.score || 0;
+  const baseMedicalScore = formData?.medicalScore?.scoring?.total_score || 
+                          formData?.medicalScore?.score || 0;
+  const prescriptionBonus = formData?.prescriptionAnalysis ? 3 : 0;
+  const medicalScore = baseMedicalScore + prescriptionBonus;
   
   // Asset score = (bank statement score + asset score) / 2
   const bankScore = formData?.bankScore?.bank_statement_credit_score || 0;
@@ -183,17 +185,22 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Medical Needs */}
           <Card 
-            className={`p-5 border shadow-sm rounded-xl bg-white ${isAdminMode ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}`}
+            className="p-5 border shadow-sm rounded-xl bg-white cursor-pointer hover:shadow-md transition-shadow"
             onClick={(e) => {
-              if (isAdminMode) {
-                e.stopPropagation();
-                setSelectedApiData({
-                  medicalScore: formData?.medicalScore,
-                  medicalAnalysis: formData?.medicalAnalysis
-                });
-                setApiDataTitle("Medical Analysis Data");
-                setShowApiData(true);
-              }
+              e.stopPropagation();
+              const drugAmount = formData?.medicalAnalysis?.medicines_info?.reduce((sum, med) => sum + (med.total_cost || 0), 0) || 0;
+              const prescriptionAmount = formData?.prescriptionAnalysis?.total_estimated_price_all_files || 0;
+              const totalAmount = drugAmount + prescriptionAmount;
+              
+              setSelectedApiData({
+                medicalScore: formData?.medicalScore,
+                medicalAnalysis: formData?.medicalAnalysis,
+                prescriptionAnalysis: formData?.prescriptionAnalysis,
+                drugAnalysis: formData?.drugAnalysis,
+                medicalNeeds: formData?.medicalNeeds
+              });
+              setApiDataTitle("Medical Assessment Details");
+              setShowApiData(true);
             }}
           >
             <div className="flex flex-col gap-4 items-center text-center">
@@ -243,20 +250,19 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
 
           {/* Asset Valuation */}
           <Card 
-            className={`p-5 border shadow-sm rounded-xl bg-white ${isAdminMode ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}`}
+            className="p-5 border shadow-sm rounded-xl bg-white cursor-pointer hover:shadow-md transition-shadow"
             onClick={(e) => {
-              if (isAdminMode) {
-                e.stopPropagation();
-                setSelectedApiData({
-                  creditEvaluation: formData?.creditEvaluation,
-                  assetAnalysis: formData?.assetAnalysis,
-                  bankAnalysis: formData?.bankAnalysis,
-                  bankScore: formData?.bankScore,
-                  mpesaAnalysis: formData?.mpesaAnalysis
-                });
-                setApiDataTitle("Asset & Financial Analysis Data");
-                setShowApiData(true);
-              }
+              e.stopPropagation();
+              setSelectedApiData({
+                creditEvaluation: formData?.creditEvaluation,
+                assetAnalysis: formData?.assetAnalysis,
+                bankAnalysis: formData?.bankAnalysis,
+                bankScore: formData?.bankScore,
+                mpesaAnalysis: formData?.mpesaAnalysis,
+                gpsAnalysis: formData?.gpsAnalysis
+              });
+              setApiDataTitle("Financial Assets Details");
+              setShowApiData(true);
             }}
           >
             <div className="flex flex-col gap-4 items-center text-center">
@@ -286,9 +292,7 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Total Assets</span>
                     <span className="font-semibold">
-                      KSh {(formData?.assetAnalysis?.analysis_result?.credit_features?.total_asset_value || 
-                           formData?.assetAnalysis?.credit_features?.total_asset_value ||
-                           formData?.assetAnalysis?.analysis_result?.summary?.total_estimated_value || 0).toLocaleString()}
+                      KSh {(formData?.assetAnalysis?.total_estimated_value || 0).toLocaleString()}
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -315,17 +319,18 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
 
           {/* Behavioral Risk */}
           <Card 
-            className={`p-5 border shadow-sm rounded-xl bg-white ${isAdminMode ? 'cursor-pointer hover:shadow-md transition-shadow' : ''}`}
+            className="p-5 border shadow-sm rounded-xl bg-white cursor-pointer hover:shadow-md transition-shadow"
             onClick={(e) => {
-              if (isAdminMode) {
-                e.stopPropagation();
-                setSelectedApiData({
-                  callLogsAnalysis: formData?.callLogsAnalysis,
-                  behaviorAnalysis: formData?.behaviorAnalysis
-                });
-                setApiDataTitle("Behavioral Risk Analysis Data");
-                setShowApiData(true);
-              }
+              e.stopPropagation();
+              setSelectedApiData({
+                callLogsAnalysis: formData?.callLogsAnalysis,
+                behaviorAnalysis: formData?.behaviorAnalysis,
+                guarantor1IdAnalysis: formData?.guarantor1IdAnalysis,
+                guarantor2IdAnalysis: formData?.guarantor2IdAnalysis,
+                mpesaBehaviorData: formData?.mpesaAnalysis?.credit_scores
+              });
+              setApiDataTitle("Behavioral Analysis Details");
+              setShowApiData(true);
             }}
           >
             <div className="flex flex-col gap-4 items-center text-center">
@@ -375,36 +380,48 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+        <div className="flex gap-3">
           <Button
-            size="lg"
-            className="flex-1 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white text-sm sm:text-base rounded-xl shadow-lg"
+            className="flex-1 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white rounded-xl shadow-lg text-sm px-3 py-2"
             onClick={() => alert("Export functionality coming soon!")}
           >
-            <FileDown className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-            <span className="truncate">Export Report</span>
+            <FileDown className="mr-1 h-4 w-4" />
+            <span className="truncate">Export</span>
           </Button>
           <Button
-            size="lg"
             variant="outline"
-            className="flex-1 text-sm sm:text-base border-2 border-primary text-primary hover:bg-primary hover:text-white rounded-xl"
+            className="flex-1 border-2 border-primary text-primary hover:bg-primary hover:text-white rounded-xl text-sm px-3 py-2"
             onClick={() => navigate("/")}
           >
-            <RefreshCw className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+            <RefreshCw className="mr-1 h-4 w-4" />
             New Assessment
           </Button>
         </div>
 
         {/* API Data Dialog */}
         <Dialog open={showApiData} onOpenChange={setShowApiData}>
-          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>{apiDataTitle}</DialogTitle>
+          <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto bg-gradient-to-br from-white to-gray-50">
+            <DialogHeader className="pb-6">
+              <DialogTitle className="text-2xl font-bold text-center bg-gradient-to-r from-[#123264] to-[#0090ff] bg-clip-text text-transparent">
+                {apiDataTitle}
+              </DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
-              <pre className="bg-muted p-4 rounded text-sm overflow-auto whitespace-pre-wrap">
-                {JSON.stringify(selectedApiData, null, 2)}
-              </pre>
+            <div className="space-y-4 max-h-96 overflow-y-auto">
+              {selectedApiData && Object.entries(selectedApiData).map(([key, value]) => (
+                <div key={key} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                  <h4 className="font-semibold text-sm mb-2 capitalize text-gray-800">
+                    {key.replace(/([A-Z])/g, ' $1').trim()}
+                  </h4>
+                  <pre className="bg-gray-50 p-3 rounded text-xs overflow-auto whitespace-pre-wrap max-h-48 text-gray-700">
+                    {JSON.stringify(value, null, 2)}
+                  </pre>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 pt-4 border-t border-gray-200">
+              <div className="text-center text-xs text-gray-500">
+                💡 This information is based on your submitted data and AI analysis
+              </div>
             </div>
           </DialogContent>
         </Dialog>

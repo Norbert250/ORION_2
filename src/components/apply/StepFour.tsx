@@ -22,8 +22,10 @@ export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFi
   const [loadingMessage, setLoadingMessage] = useState('');
   
   // Calculate real-time scores from API responses
-  const medicalScore = formData?.medicalScore?.scoring?.total_score || 
-                      formData?.medicalScore?.score || 0;
+  const baseMedicalScore = formData?.medicalScore?.scoring?.total_score || 
+                          formData?.medicalScore?.score || 0;
+  const prescriptionBonus = formData?.prescriptionAnalysis ? 3 : 0;
+  const medicalScore = baseMedicalScore + prescriptionBonus;
   
   // Asset score = (bank statement score + asset score) / 2 (same as Step 3)
   const bankScore = formData?.bankScore?.bank_statement_credit_score || 0;
@@ -254,21 +256,21 @@ export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFi
                     <p className="text-sm text-muted-foreground mb-2">
                       {formData.guarantor1Id.name}
                     </p>
-                    {formData.guarantor1IdAnalysis?.fields && (
+                    {formData.guarantor1IdAnalysis && (
                       <div className="bg-[#f4faff] p-3 rounded-lg text-sm">
                         <h4 className="font-semibold text-[#123264] mb-2">Extracted Information:</h4>
                         <div className="space-y-1">
-                          {formData.guarantor1IdAnalysis.fields.FullName && (
-                            <p><span className="font-medium">Name:</span> {formData.guarantor1IdAnalysis.fields.FullName}</p>
+                          {(formData.guarantor1IdAnalysis.fields?.FullName || formData.guarantor1IdAnalysis.FullName) && (
+                            <p><span className="font-medium">Name:</span> {formData.guarantor1IdAnalysis.fields?.FullName || formData.guarantor1IdAnalysis.FullName}</p>
                           )}
-                          {formData.guarantor1IdAnalysis.fields.IDNumber && (
-                            <p><span className="font-medium">ID Number:</span> {formData.guarantor1IdAnalysis.fields.IDNumber}</p>
+                          {(formData.guarantor1IdAnalysis.fields?.IDNumber || formData.guarantor1IdAnalysis.IDNumber) && (
+                            <p><span className="font-medium">ID Number:</span> {formData.guarantor1IdAnalysis.fields?.IDNumber || formData.guarantor1IdAnalysis.IDNumber}</p>
                           )}
-                          {formData.guarantor1IdAnalysis.fields.Nationality && (
-                            <p><span className="font-medium">Nationality:</span> {formData.guarantor1IdAnalysis.fields.Nationality}</p>
+                          {(formData.guarantor1IdAnalysis.fields?.Nationality || formData.guarantor1IdAnalysis.Nationality) && (
+                            <p><span className="font-medium">Nationality:</span> {formData.guarantor1IdAnalysis.fields?.Nationality || formData.guarantor1IdAnalysis.Nationality}</p>
                           )}
-                          {formData.guarantor1IdAnalysis.fields.PassportNumber && (
-                            <p><span className="font-medium">Passport:</span> {formData.guarantor1IdAnalysis.fields.PassportNumber}</p>
+                          {(formData.guarantor1IdAnalysis.fields?.PassportNumber || formData.guarantor1IdAnalysis.PassportNumber) && (
+                            <p><span className="font-medium">Passport:</span> {formData.guarantor1IdAnalysis.fields?.PassportNumber || formData.guarantor1IdAnalysis.PassportNumber}</p>
                           )}
                         </div>
                       </div>
@@ -345,21 +347,21 @@ export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFi
                     <p className="text-sm text-muted-foreground mb-2">
                       {formData.guarantor2Id.name}
                     </p>
-                    {formData.guarantor2IdAnalysis?.fields && (
+                    {formData.guarantor2IdAnalysis && (
                       <div className="bg-[#f4faff] p-3 rounded-lg text-sm">
                         <h4 className="font-semibold text-[#123264] mb-2">Extracted Information:</h4>
                         <div className="space-y-1">
-                          {formData.guarantor2IdAnalysis.fields.FullName && (
-                            <p><span className="font-medium">Name:</span> {formData.guarantor2IdAnalysis.fields.FullName}</p>
+                          {(formData.guarantor2IdAnalysis.fields?.FullName || formData.guarantor2IdAnalysis.FullName) && (
+                            <p><span className="font-medium">Name:</span> {formData.guarantor2IdAnalysis.fields?.FullName || formData.guarantor2IdAnalysis.FullName}</p>
                           )}
-                          {formData.guarantor2IdAnalysis.fields.IDNumber && (
-                            <p><span className="font-medium">ID Number:</span> {formData.guarantor2IdAnalysis.fields.IDNumber}</p>
+                          {(formData.guarantor2IdAnalysis.fields?.IDNumber || formData.guarantor2IdAnalysis.IDNumber) && (
+                            <p><span className="font-medium">ID Number:</span> {formData.guarantor2IdAnalysis.fields?.IDNumber || formData.guarantor2IdAnalysis.IDNumber}</p>
                           )}
-                          {formData.guarantor2IdAnalysis.fields.Nationality && (
-                            <p><span className="font-medium">Nationality:</span> {formData.guarantor2IdAnalysis.fields.Nationality}</p>
+                          {(formData.guarantor2IdAnalysis.fields?.Nationality || formData.guarantor2IdAnalysis.Nationality) && (
+                            <p><span className="font-medium">Nationality:</span> {formData.guarantor2IdAnalysis.fields?.Nationality || formData.guarantor2IdAnalysis.Nationality}</p>
                           )}
-                          {formData.guarantor2IdAnalysis.fields.PassportNumber && (
-                            <p><span className="font-medium">Passport:</span> {formData.guarantor2IdAnalysis.fields.PassportNumber}</p>
+                          {(formData.guarantor2IdAnalysis.fields?.PassportNumber || formData.guarantor2IdAnalysis.PassportNumber) && (
+                            <p><span className="font-medium">Passport:</span> {formData.guarantor2IdAnalysis.fields?.PassportNumber || formData.guarantor2IdAnalysis.PassportNumber}</p>
                           )}
                         </div>
                       </div>
@@ -398,12 +400,12 @@ export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFi
             type="button"
             onClick={handleNext}
             disabled={isLoading}
-            className="flex-1 bg-primary hover:bg-primary/90"
+            className="flex-1 bg-primary hover:bg-primary/90 min-w-0"
           >
             {isLoading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {loadingMessage}
+                <Loader2 className="mr-2 h-4 w-4 animate-spin flex-shrink-0" />
+                <span className="truncate">{loadingMessage}</span>
               </>
             ) : (
               <>

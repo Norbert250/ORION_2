@@ -75,8 +75,10 @@ export const StepFive = ({ formData, prevStep, handleSubmit }: StepFiveProps) =>
     }
   };
   // Calculate real-time scores from API responses (same as Steps 3 & 4)
-  const medicalScore = formData?.medicalScore?.scoring?.total_score || 
-                      formData?.medicalScore?.score || 0;
+  const baseMedicalScore = formData?.medicalScore?.scoring?.total_score || 
+                          formData?.medicalScore?.score || 0;
+  const prescriptionBonus = formData?.prescriptionAnalysis ? 3 : 0;
+  const medicalScore = baseMedicalScore + prescriptionBonus;
   
   // Asset score = (bank statement score + asset score) / 2
   const bankScore = formData?.bankScore?.bank_statement_credit_score || 0;
@@ -253,12 +255,12 @@ export const StepFive = ({ formData, prevStep, handleSubmit }: StepFiveProps) =>
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
+        <div className="flex gap-4 pt-4">
           <Button
             type="button"
             variant="outline"
             onClick={prevStep}
-            className="flex-1 text-sm sm:text-base"
+            className="flex-1"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
@@ -267,17 +269,17 @@ export const StepFive = ({ formData, prevStep, handleSubmit }: StepFiveProps) =>
             type="button"
             onClick={submitToSupabase}
             disabled={isSubmitting}
-            className="flex-1 bg-primary hover:bg-primary/90 text-sm sm:text-base"
+            className="flex-1 bg-primary hover:bg-primary/90 min-w-0"
           >
             {isSubmitting ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Submitting...
+                <Loader2 className="mr-2 h-4 w-4 animate-spin flex-shrink-0" />
+                <span className="truncate">Submitting...</span>
               </>
             ) : (
               <>
-                Submit Application
-                <CheckCircle2 className="ml-2 h-4 w-4" />
+                <span className="truncate">Submit Application</span>
+                <CheckCircle2 className="ml-2 h-4 w-4 flex-shrink-0" />
               </>
             )}
           </Button>

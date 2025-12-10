@@ -106,20 +106,50 @@ const AdminDashboard = () => {
         .from('applications')
         .select(`
           *,
-          medical_analysis(medical_score),
-          credit_evaluation(credit_score),
-          call_logs_analysis(score)
+          medical_analysis(medical_score, prescription_analysis, analysis_result),
+          credit_evaluation(credit_score, evaluation_result, full_evaluation),
+          call_logs_analysis(score, analysis_result, full_analysis),
+          bank_analysis(bank_score, analysis_result, full_bank_analysis, full_bank_score),
+          mpesa_analysis(analysis_result),
+          id_analysis(guarantor_type, analysis_result),
+          asset_analysis(analysis_result),
+          gps_analysis(analysis_result)
         `)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      const processedApps = apps?.map(app => ({
-        ...app,
-        medical_score: app.medical_analysis?.[0]?.medical_score?.scoring?.total_score || 0,
-        asset_score: app.credit_evaluation?.[0]?.credit_score || 0,
-        behavior_score: app.call_logs_analysis?.[0]?.score
-      })) || [];
+      const processedApps = apps?.map(app => {
+        // Medical score with prescription bonus
+        const baseMedicalScore = app.medical_analysis?.[0]?.medical_score?.scoring?.total_score || 
+                                app.medical_analysis?.[0]?.medical_score?.score || 0;
+        const prescriptionBonus = app.medical_analysis?.[0]?.prescription_analysis ? 3 : 0;
+        const medical_score = baseMedicalScore + prescriptionBonus;
+        
+        // Asset score = (bank score + credit evaluation score) / 2
+        const bankScore = app.bank_analysis?.[0]?.bank_score?.bank_statement_credit_score || 0;
+        const rawAssetScore = app.credit_evaluation?.[0]?.credit_score || 0;
+        const asset_score = (bankScore && rawAssetScore) ? Math.round((bankScore + rawAssetScore) / 2) : (bankScore || rawAssetScore);
+        
+        // Behavior score with guarantor bonuses
+        const mpesaBehaviorScore = app.mpesa_analysis?.[0]?.analysis_result?.credit_scores?.behavior_score || 0;
+        const callLogsScore = app.call_logs_analysis?.[0]?.score || 0;
+        const guarantor1Bonus = app.id_analysis?.find((id: any) => id.guarantor_type === 'guarantor1') ? 3 : 0;
+        const guarantor2Bonus = app.id_analysis?.find((id: any) => id.guarantor_type === 'guarantor2') ? 3 : 0;
+        
+        const behavior_score = callLogsScore ? (
+          (mpesaBehaviorScore && callLogsScore) ? 
+            Math.round((mpesaBehaviorScore + callLogsScore) / 2) + guarantor1Bonus + guarantor2Bonus :
+            callLogsScore + guarantor1Bonus + guarantor2Bonus
+        ) : 0;
+        
+        return {
+          ...app,
+          medical_score,
+          asset_score,
+          behavior_score
+        };
+      }) || [];
 
       setApplications(processedApps);
     } catch (error) {
@@ -135,14 +165,14 @@ const AdminDashboard = () => {
         .from('applications')
         .select(`
           *,
-          gps_analysis(*),
-          asset_analysis(*),
-          medical_analysis(*),
-          bank_analysis(*),
-          mpesa_analysis(*),
-          call_logs_analysis(*),
-          credit_evaluation(*),
-          id_analysis(*)
+          gps_analysis(*, analysis_result),
+          asset_analysis(*, analysis_result),
+          medical_analysis(*, analysis_result),
+          bank_analysis(*, analysis_result, full_bank_analysis, full_bank_score),
+          mpesa_analysis(*, analysis_result),
+          call_logs_analysis(*, analysis_result, full_analysis),
+          credit_evaluation(*, evaluation_result, full_evaluation),
+          id_analysis(*, analysis_result)
         `)
         .eq('id', applicationId)
         .single();
@@ -200,7 +230,11 @@ const AdminDashboard = () => {
     pending: applications.filter(app => app.status === 'pending').length,
     approved: applications.filter(app => app.status === 'approved').length,
     avgScore: applications.length > 0 
-      ? Math.round(applications.reduce((sum, app) => sum + (((app.medical_score || 0) + (app.asset_score || 0) + (app.behavior_score || 0)) / 3), 0) / applications.length)
+      ? Math.round(applications.reduce((sum, app) => {
+          const appOverall = ((app.medical_score || 0) + (app.asset_score || 0) + (app.behavior_score || 0)) / 3;
+          console.log(`Stats calc - App overall: ${appOverall}`);
+          return sum + appOverall;
+        }, 0) / applications.length)
       : 0
   };
 
@@ -219,103 +253,103 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-4">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
-                <FileText className="h-5 w-5 text-white" />
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-14 sm:h-16">
+            <div className="flex items-center gap-2 sm:gap-4">
+              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
+                <FileText className="h-3 w-3 sm:h-5 sm:w-5 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-900">CheckupsMed</h1>
-                <p className="text-xs text-gray-500">Admin Dashboard</p>
+                <h1 className="text-lg sm:text-xl font-bold text-gray-900">CheckupsMed</h1>
+                <p className="text-xs text-gray-500 hidden sm:block">Admin Dashboard</p>
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 px-2 py-1 bg-green-50 rounded-md">
+            <div className="flex items-center gap-2 sm:gap-4">
+              <div className="flex items-center gap-1 sm:gap-2 px-2 py-1 bg-green-50 rounded-md">
                 <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
                 <span className="text-xs font-medium text-green-700">Live</span>
               </div>
-              <Button onClick={fetchApplications} variant="ghost" size="sm" className="text-gray-600">Refresh</Button>
+              <Button onClick={fetchApplications} variant="ghost" size="sm" className="text-gray-600 text-xs sm:text-sm px-2 sm:px-3">Refresh</Button>
             </div>
           </div>
         </div>
       </div>
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-4 sm:space-y-8">
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+          <div className="bg-white p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <div className="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
-                  <FileText className="h-4 w-4 text-white" />
+                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-500 rounded-md flex items-center justify-center">
+                  <FileText className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                 </div>
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Total Applications</p>
-                <p className="text-2xl font-semibold text-gray-900">{stats.total}</p>
+              <div className="ml-2 sm:ml-4">
+                <p className="text-xs sm:text-sm font-medium text-gray-500">Total</p>
+                <p className="text-lg sm:text-2xl font-semibold text-gray-900">{stats.total}</p>
               </div>
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <div className="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center">
-                  <Calendar className="h-4 w-4 text-white" />
+                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-yellow-500 rounded-md flex items-center justify-center">
+                  <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                 </div>
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Pending Review</p>
-                <p className="text-2xl font-semibold text-yellow-600">{stats.pending}</p>
+              <div className="ml-2 sm:ml-4">
+                <p className="text-xs sm:text-sm font-medium text-gray-500">Pending</p>
+                <p className="text-lg sm:text-2xl font-semibold text-yellow-600">{stats.pending}</p>
               </div>
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <div className="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
-                  <CheckCircle className="h-4 w-4 text-white" />
+                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-green-500 rounded-md flex items-center justify-center">
+                  <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                 </div>
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Approved</p>
-                <p className="text-2xl font-semibold text-green-600">{stats.approved}</p>
+              <div className="ml-2 sm:ml-4">
+                <p className="text-xs sm:text-sm font-medium text-gray-500">Approved</p>
+                <p className="text-lg sm:text-2xl font-semibold text-green-600">{stats.approved}</p>
               </div>
             </div>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white p-3 sm:p-6 rounded-lg shadow-sm border border-gray-200">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <div className="w-8 h-8 bg-purple-500 rounded-md flex items-center justify-center">
-                  <TrendingUp className="h-4 w-4 text-white" />
+                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-purple-500 rounded-md flex items-center justify-center">
+                  <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                 </div>
               </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Avg Credit Score</p>
-                <p className={`text-2xl font-semibold ${getScoreColor(stats.avgScore)}`}>{stats.avgScore}%</p>
+              <div className="ml-2 sm:ml-4">
+                <p className="text-xs sm:text-sm font-medium text-gray-500">Avg Score</p>
+                <p className={`text-lg sm:text-2xl font-semibold ${getScoreColor(stats.avgScore)}`}>{stats.avgScore}%</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Search */}
-        <div className="flex items-center justify-between">
+        <div className="space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Applications</h2>
-            <p className="text-gray-600">Manage and review credit applications</p>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Applications</h2>
+            <p className="text-sm sm:text-base text-gray-600 hidden sm:block">Manage and review credit applications</p>
           </div>
           <div className="flex items-center gap-3">
-            <div className="relative">
+            <div className="relative flex-1 sm:flex-none">
               <Search className="h-4 w-4 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
               <Input
-                placeholder="Search applications..."
+                placeholder="Search..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 w-80 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                className="pl-10 w-full sm:w-80 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
           </div>
@@ -323,42 +357,43 @@ const AdminDashboard = () => {
 
         {/* Applications Table */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+          <div className="px-3 sm:px-6 py-3 sm:py-4 bg-gray-50 border-b border-gray-200">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Recent Applications</h3>
-              <span className="text-sm text-gray-500">{filteredApplications.length} total</span>
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900">Recent Applications</h3>
+              <span className="text-xs sm:text-sm text-gray-500">{filteredApplications.length} total</span>
             </div>
           </div>
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Loan ID</TableHead>
-                  <TableHead>User ID</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Medical</TableHead>
-                  <TableHead>Assets</TableHead>
-                  <TableHead>Behavior</TableHead>
-                  <TableHead>Overall</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead className="text-xs sm:text-sm">Loan ID</TableHead>
+                  <TableHead className="text-xs sm:text-sm hidden sm:table-cell">User ID</TableHead>
+                  <TableHead className="text-xs sm:text-sm">Status</TableHead>
+                  <TableHead className="text-xs sm:text-sm">Med</TableHead>
+                  <TableHead className="text-xs sm:text-sm">Asset</TableHead>
+                  <TableHead className="text-xs sm:text-sm hidden sm:table-cell">Behavior</TableHead>
+                  <TableHead className="text-xs sm:text-sm">Overall</TableHead>
+                  <TableHead className="text-xs sm:text-sm hidden sm:table-cell">Date</TableHead>
+                  <TableHead className="text-xs sm:text-sm">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredApplications.map((app) => {
                   const overallScore = Math.round(((app.medical_score || 0) + (app.asset_score || 0) + (app.behavior_score || 0)) / 3);
+                  console.log(`App ${app.loan_id} - Medical: ${app.medical_score}, Asset: ${app.asset_score}, Behavior: ${app.behavior_score}, Overall: ${overallScore}`);
                   return (
                     <TableRow key={app.id}>
-                      <TableCell className="font-medium">{app.loan_id}</TableCell>
-                      <TableCell>{app.user_id}</TableCell>
-                      <TableCell>
+                      <TableCell className="font-medium text-xs sm:text-sm">{app.loan_id.slice(-8)}</TableCell>
+                      <TableCell className="text-xs sm:text-sm hidden sm:table-cell">{app.user_id}</TableCell>
+                      <TableCell className="text-xs sm:text-sm">
                         {getStatusBadge(app.status)}
                       </TableCell>
-                      <TableCell className={getScoreColor(app.medical_score)}>{app.medical_score}%</TableCell>
-                      <TableCell className={getScoreColor(app.asset_score)}>{app.asset_score}%</TableCell>
-                      <TableCell className={getScoreColor(app.behavior_score)}>{app.behavior_score}%</TableCell>
-                      <TableCell className={`font-bold ${getScoreColor(overallScore)}`}>{overallScore}%</TableCell>
-                      <TableCell>{new Date(app.created_at).toLocaleDateString()}</TableCell>
+                      <TableCell className={`text-xs sm:text-sm ${getScoreColor(app.medical_score || 0)}`}>{app.medical_score || 0}</TableCell>
+                      <TableCell className={`text-xs sm:text-sm ${getScoreColor(app.asset_score || 0)}`}>{app.asset_score || 0}</TableCell>
+                      <TableCell className={`text-xs sm:text-sm hidden sm:table-cell ${getScoreColor(app.behavior_score || 0)}`}>{app.behavior_score || 0}</TableCell>
+                      <TableCell className={`text-xs sm:text-sm font-bold ${getScoreColor(overallScore)}`}>{overallScore}</TableCell>
+                      <TableCell className="text-xs sm:text-sm hidden sm:table-cell">{new Date(app.created_at).toLocaleDateString()}</TableCell>
                       <TableCell>
                         <div className="flex gap-1">
                           <Dialog>
@@ -368,35 +403,37 @@ const AdminDashboard = () => {
                                 size="sm"
                                 onClick={() => fetchApplicationDetails(app.id)}
                                 title="Review"
+                                className="h-7 w-7 p-0 sm:h-8 sm:w-8"
                               >
-                                <FileCheck className="h-4 w-4" />
+                                <FileCheck className="h-3 w-3 sm:h-4 sm:w-4" />
                               </Button>
                             </DialogTrigger>
-                            <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                            <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[80vh] overflow-y-auto mx-2">
                               <DialogHeader>
-                                <DialogTitle>Application Review - {app.loan_id}</DialogTitle>
+                                <DialogTitle className="text-sm sm:text-base">Application Review - {app.loan_id}</DialogTitle>
                               </DialogHeader>
                               {selectedApplication ? (
                                 <Dashboard 
                                   formData={{
                                     medicalScore: selectedApplication.medical_analysis?.[0]?.medical_score,
-                                    medicalAnalysis: selectedApplication.medical_analysis?.[0],
+                                    prescriptionAnalysis: selectedApplication.medical_analysis?.[0]?.prescription_analysis,
+                                    medicalAnalysis: selectedApplication.medical_analysis?.[0]?.analysis_result,
                                     creditEvaluation: selectedApplication.credit_evaluation?.[0],
                                     assetAnalysis: selectedApplication.asset_analysis?.[0],
                                     bankAnalysis: selectedApplication.bank_analysis?.[0],
                                     bankScore: selectedApplication.bank_analysis?.[0]?.bank_score,
-                                    mpesaAnalysis: selectedApplication.mpesa_analysis?.[0],
+                                    mpesaAnalysis: selectedApplication.mpesa_analysis?.[0]?.analysis_result,
                                     callLogsAnalysis: selectedApplication.call_logs_analysis?.[0],
-                                    behaviorAnalysis: selectedApplication.call_logs_analysis?.[0],
-                                    gpsAnalysis: selectedApplication.gps_analysis?.[0],
-                                    idAnalysis: selectedApplication.id_analysis?.[0]
+                                    guarantor1IdAnalysis: selectedApplication.id_analysis?.find((id: any) => id.guarantor_type === 'guarantor1')?.analysis_result,
+                                    guarantor2IdAnalysis: selectedApplication.id_analysis?.find((id: any) => id.guarantor_type === 'guarantor2')?.analysis_result,
+                                    gpsAnalysis: selectedApplication.gps_analysis?.[0]
                                   }} 
                                   isAdminMode={true} 
                                 />
                               ) : (
                                 <div className="flex items-center justify-center p-8">
                                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                                  <span className="ml-2">Loading application details...</span>
+                                  <span className="ml-2 text-sm">Loading...</span>
                                 </div>
                               )}
                             </DialogContent>
@@ -406,22 +443,22 @@ const AdminDashboard = () => {
                           variant="outline" 
                           size="sm"
                           onClick={() => updateStatus(app.id, 'approved')}
-                          disabled={app.status === 'approved'}
-                          className="text-green-600 hover:text-green-700"
+                          disabled={app.status === 'approved' || app.status === 'rejected'}
+                          className="text-green-600 hover:text-green-700 h-7 w-7 p-0 sm:h-8 sm:w-8"
                           title="Approve"
                         >
-                          <CheckCircle className="h-4 w-4" />
+                          <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
                         
                         <Button 
                           variant="outline" 
                           size="sm"
                           onClick={() => updateStatus(app.id, 'rejected')}
-                          disabled={app.status === 'rejected'}
-                          className="text-red-600 hover:text-red-700"
+                          disabled={app.status === 'rejected' || app.status === 'approved'}
+                          className="text-red-600 hover:text-red-700 h-7 w-7 p-0 sm:h-8 sm:w-8"
                           title="Reject"
                         >
-                          <XCircle className="h-4 w-4" />
+                          <XCircle className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
                         </div>
                       </TableCell>

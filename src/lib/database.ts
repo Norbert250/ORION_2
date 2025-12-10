@@ -33,7 +33,8 @@ export class DatabaseService {
         user_id: data.user_id,
         status: data.status,
         reference: data.reference,
-        items: data.items
+        items: data.items,
+        analysis_result: data
       })
     
     if (error) throw error
@@ -48,7 +49,8 @@ export class DatabaseService {
         batch_id: data.batch_id,
         message: data.message,
         total_files: data.total_files,
-        files: data.files
+        files: data.files,
+        analysis_result: data
       })
     
     if (error) throw error
@@ -61,6 +63,7 @@ export class DatabaseService {
       .insert({
         application_id: applicationId,
         prescription_analysis: formData.prescriptionAnalysis,
+        analysis_result: formData.medicalAnalysis,
         drug_analysis: formData.drugAnalysis,
         medical_needs: formData.medicalNeeds,
         medical_score: formData.medicalScore
@@ -77,7 +80,9 @@ export class DatabaseService {
         application_id: applicationId,
         analysis_result: formData.bankAnalysis,
         credit_score_ready_values: formData.bankAnalysis?.credit_score_ready_values,
-        bank_score: formData.bankScore
+        bank_score: formData.bankScore,
+        full_bank_analysis: formData.bankAnalysis,
+        full_bank_score: formData.bankScore
       })
     
     if (error) throw error
@@ -103,7 +108,8 @@ export class DatabaseService {
         application_id: applicationId,
         credit_score: data.credit_score,
         score: data.score,
-        analysis_result: data
+        analysis_result: data,
+        full_analysis: data
       })
     
     if (error) throw error
@@ -116,7 +122,8 @@ export class DatabaseService {
       .insert({
         application_id: applicationId,
         credit_score: data.credit_score,
-        evaluation_result: data
+        evaluation_result: data,
+        full_evaluation: data
       })
     
     if (error) throw error

@@ -24,8 +24,10 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
 
   
   // Calculate real-time scores from API responses
-  const medicalScore = formData?.medicalScore?.scoring?.total_score || 
-                      formData?.medicalScore?.score || 0;
+  const baseMedicalScore = formData?.medicalScore?.scoring?.total_score || 
+                          formData?.medicalScore?.score || 0;
+  const prescriptionBonus = formData?.prescriptionAnalysis ? 3 : 0;
+  const medicalScore = baseMedicalScore + prescriptionBonus;
   
   // Asset score = (bank statement score + asset score) / 2
   const bankScore = formData?.bankScore?.bank_statement_credit_score || 0;
@@ -93,9 +95,9 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
       formData.append('files', file);
     });
     
-    console.log('Sending to Assets API:', 'http://157.245.20.199:8000/analysis/create_batch');
+    console.log('Sending to Assets API:', 'http://157.245.20.199:8000/api/v1/process-images');
     
-    const response = await fetch('http://157.245.20.199:8000/analysis/create_batch', {
+    const response = await fetch('http://157.245.20.199:8000/api/v1/process-images', {
       method: 'POST',
       body: formData,
     });
@@ -191,79 +193,62 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
   const evaluateCredit = async (assetAnalysisResult: any, gpsAnalysisResult?: any) => {
     console.log('Evaluating credit with asset data...');
     
-    // Extract GPS location data
-    const gpsItems = gpsAnalysisResult?.items || [];
-    const hasLocationData = gpsItems.length > 0;
+    // Extract asset data from new API format
+    const assetsDetected = assetAnalysisResult?.assets_detected || [];
+    const totalAssetsDetected = assetsDetected.length;
+    const totalEstimatedValue = assetAnalysisResult?.total_estimated_value || 0;
+    const hasLocationData = assetsDetected.some((asset: any) => asset.exif_location);
     
-    // Calculate location stability from GPS data
-    const locationStabilityScore = hasLocationData ? 
-      (gpsItems.filter((item: any) => item.flag === 'normal').length / gpsItems.length) : 0;
-    
-    // Extract asset data
-    const assetFiles = assetAnalysisResult?.files || [];
-    const totalAssetsDetected = assetFiles.reduce((sum: number, file: any) => sum + (file.assets?.length || 0), 0);
-    
-    // Build detected assets combining both APIs
-    const detectedAssets = assetFiles.flatMap((file: any, fileIndex: number) => 
-      (file.assets || []).map((asset: any, assetIndex: number) => {
-        const gpsItem = gpsItems[fileIndex] || gpsItems[0];
-        return {
-          asset_type: asset.type || 'unknown',
-          asset_count: 1,
-          asset_category: asset.category || 'general',
-          condition_score: asset.condition_score || 0.5,
-          estimated_value: asset.estimated_value || 0,
-          gps_coordinates: gpsItem ? `${gpsItem.latitude},${gpsItem.longitude}` : '0.0,0.0',
-          device_model: gpsItem?.device_model || 'unknown',
-          timestamp: new Date().toISOString(),
-          camera_make: asset.camera_make || 'unknown',
-          camera_model: asset.camera_model || 'unknown',
-          image_source: 'camera',
-          detection_confidence: asset.confidence || 0.5,
-          exif_verified: !!asset.exif_data
-        };
-      })
-    );
+    // Build detected assets from new API format
+    const detectedAssets = assetsDetected.map((asset: any) => ({
+      asset_type: asset.object_name || 'unknown',
+      asset_count: 1,
+      asset_category: 'general',
+      condition_score: asset.condition === 'good' ? 0.8 : asset.condition === 'fair' ? 0.6 : 0.4,
+      estimated_value: asset.estimated_value || 0,
+      gps_coordinates: asset.exif_location || '0.0,0.0',
+      device_model: 'unknown',
+      timestamp: new Date().toISOString(),
+      camera_make: 'unknown',
+      camera_model: 'unknown',
+      image_source: 'camera',
+      detection_confidence: asset.confidence || 0.5,
+      exif_verified: asset.has_exif || false
+    }));
     
     const creditData = {
-      message: assetAnalysisResult.message || 'Asset analysis completed',
+      message: 'Asset analysis completed',
       batch_id: assetAnalysisResult.batch_id || 'BATCH_' + Date.now(),
       user_id: '8988',
       status: 'completed',
-      total_files: formData.assetPictures.length + (formData.homePhoto ? 1 : 0) + (formData.businessPhoto ? 1 : 0),
-      estimated_completion_time: assetAnalysisResult.estimated_completion_time || '2-3 minutes',
-      status_check_url: assetAnalysisResult.status_check_url || '',
+      total_files: assetAnalysisResult.images_processed || 1,
+      estimated_completion_time: '2-3 minutes',
+      status_check_url: '',
       loan_id: 'LOAN_' + Date.now(),
       analysis_result: {
         batch_id: assetAnalysisResult.batch_id || 'BATCH_' + Date.now(),
-        loan_id: 'LOAN_' + Date.now(),
+        loan_id: assetAnalysisResult.loan_id || 'LOAN_' + Date.now(),
         analysis_timestamp: new Date().toISOString(),
-        total_images_processed: formData.assetPictures.length + (formData.homePhoto ? 1 : 0) + (formData.businessPhoto ? 1 : 0),
-        total_assets_detected: Math.max(totalAssetsDetected, 1),
+        total_images_processed: assetAnalysisResult.images_processed || 1,
+        total_assets_detected: totalAssetsDetected,
         credit_features: {
-          total_asset_value: assetFiles.reduce((sum: number, file: any) => sum + (file.total_value || 0), 0),
-          asset_diversity_score: assetFiles.length > 0 ? (new Set(assetFiles.flatMap((f: any) => f.assets?.map((a: any) => a.category) || [])).size / 10) : 0,
-          asset_categories: assetFiles.reduce((cats: any, file: any) => {
-            (file.assets || []).forEach((asset: any) => {
-              const category = asset.category || 'general';
-              cats[category] = (cats[category] || 0) + 1;
-            });
-            return cats;
-          }, {}),
-          has_transport_asset: assetFiles.some((f: any) => f.assets?.some((a: any) => a.category === 'transport')),
-          has_electronics_asset: assetFiles.some((f: any) => f.assets?.some((a: any) => a.category === 'electronics')),
-          has_livestock_asset: assetFiles.some((f: any) => f.assets?.some((a: any) => a.category === 'livestock')),
-          has_property_asset: assetFiles.some((f: any) => f.assets?.some((a: any) => a.category === 'property')),
+          total_asset_value: totalEstimatedValue,
+          asset_diversity_score: totalAssetsDetected > 0 ? (new Set(detectedAssets.map(a => a.asset_type)).size / 10) : 0,
+          asset_categories: { general: totalAssetsDetected },
+          has_transport_asset: detectedAssets.some(a => a.asset_type.toLowerCase().includes('car') || a.asset_type.toLowerCase().includes('vehicle')),
+          has_electronics_asset: detectedAssets.some(a => a.asset_type.toLowerCase().includes('phone') || a.asset_type.toLowerCase().includes('laptop')),
+          has_livestock_asset: detectedAssets.some(a => a.asset_type.toLowerCase().includes('cow') || a.asset_type.toLowerCase().includes('goat')),
+          has_property_asset: detectedAssets.some(a => a.asset_type.toLowerCase().includes('house') || a.asset_type.toLowerCase().includes('land')),
           has_high_value_assets: detectedAssets.some(asset => asset.estimated_value > 10000),
           high_value_asset_count: detectedAssets.filter(asset => asset.estimated_value > 10000).length,
           average_asset_condition: detectedAssets.length > 0 ? (detectedAssets.reduce((sum, asset) => sum + asset.condition_score, 0) / detectedAssets.length) : 0,
-          location_stability_score: locationStabilityScore,
-          primary_device_model: gpsItems[0]?.device_model || 'unknown',
+          location_stability_score: hasLocationData ? 0.8 : 0,
+          primary_device_model: 'unknown',
           primary_device_tier_score: 0.5,
-          unique_devices_count: new Set(gpsItems.map((item: any) => item.device_model)).size,
-          asset_to_device_ratio: gpsItems.length > 0 ? (totalAssetsDetected / gpsItems.length) : 0,
+          unique_devices_count: 1,
+          asset_to_device_ratio: totalAssetsDetected,
           image_span_days: 1,
-          images_per_day: formData.assetPictures.length,
+          images_per_day: assetAnalysisResult.images_processed || 1,
           has_recent_images: true,
           asset_concentration_score: 0.5,
           average_detection_confidence: detectedAssets.length > 0 ? (detectedAssets.reduce((sum, asset) => sum + asset.detection_confidence, 0) / detectedAssets.length) : 0
@@ -275,8 +260,8 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
             asset_category: 'general',
             condition_score: 0.5,
             estimated_value: 1000,
-            gps_coordinates: gpsItems[0] ? `${gpsItems[0].latitude},${gpsItems[0].longitude}` : '0.0,0.0',
-            device_model: gpsItems[0]?.device_model || 'unknown',
+            gps_coordinates: '0.0,0.0',
+            device_model: 'unknown',
             timestamp: new Date().toISOString(),
             camera_make: 'unknown',
             camera_model: 'unknown',
@@ -288,9 +273,9 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
         summary: {
           unique_asset_types: new Set(detectedAssets.map(asset => asset.asset_type)).size,
           asset_categories_found: Array.from(new Set(detectedAssets.map(asset => asset.asset_category))),
-          total_estimated_value: detectedAssets.reduce((sum, asset) => sum + asset.estimated_value, 0),
+          total_estimated_value: totalEstimatedValue,
           has_location_data: hasLocationData,
-          devices_detected: Array.from(new Set(gpsItems.map((item: any) => item.device_model || 'unknown'))),
+          devices_detected: ['unknown'],
           exif_verification_rate: detectedAssets.length > 0 ? (detectedAssets.filter(asset => asset.exif_verified).length / detectedAssets.length).toString() : '0',
           authenticity_verification: {
             images_with_exif: detectedAssets.filter(asset => asset.exif_verified).length,
@@ -486,15 +471,9 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
                       const bankScore = await scoreBankStatement(bankAnalysis);
                       console.log('✅ Bank statement scoring complete:', bankScore);
                       
-                      // Add 3 points to current asset score
-                      const currentAssetScore = formData?.creditEvaluation?.credit_score || 0;
-                      const mpesaBonus = formData?.mpesaAnalysis ? 3 : 0;
-                      const totalAssetScore = { credit_score: currentAssetScore + 3 + mpesaBonus };
-                      
                       updateFormData({ 
                         bankAnalysis, 
-                        bankScore, 
-                        creditEvaluation: totalAssetScore 
+                        bankScore
                       });
                     } catch (error) {
                       console.error('❌ Bank statement analysis error:', error);
@@ -545,14 +524,8 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
                       const mpesaAnalysis = await analyzeMpesaStatement(file, formData.mpesaPassword);
                       console.log('✅ M-Pesa analysis complete:', mpesaAnalysis);
                       
-                      // Add 3 points to current asset score
-                      const currentAssetScore = formData?.creditEvaluation?.credit_score || 0;
-                      const bankBonus = formData?.bankScore ? 3 : 0;
-                      const totalAssetScore = { credit_score: currentAssetScore + 3 + bankBonus };
-                      
                       updateFormData({ 
-                        mpesaAnalysis, 
-                        creditEvaluation: totalAssetScore 
+                        mpesaAnalysis
                       });
                     } catch (error) {
                       console.error('❌ M-Pesa analysis error:', error);
@@ -671,12 +644,12 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
             type="button"
             onClick={handleNext}
             disabled={isLoading}
-            className="flex-1 bg-primary hover:bg-primary/90"
+            className="flex-1 bg-primary hover:bg-primary/90 min-w-0"
           >
             {isLoading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                {loadingMessage}
+                <Loader2 className="mr-2 h-4 w-4 animate-spin flex-shrink-0" />
+                <span className="truncate">{loadingMessage}</span>
               </>
             ) : (
               <>
