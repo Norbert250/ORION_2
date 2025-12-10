@@ -327,7 +327,7 @@ const Dashboard = ({ formData: propFormData, isAdminMode = false }: DashboardPro
                 behaviorAnalysis: formData?.behaviorAnalysis,
                 guarantor1IdAnalysis: formData?.guarantor1IdAnalysis,
                 guarantor2IdAnalysis: formData?.guarantor2IdAnalysis,
-                mpesaBehaviorData: formData?.mpesaAnalysis?.credit_scores
+                mpesaAnalysis: formData?.mpesaAnalysis
               });
               setApiDataTitle("Behavioral Analysis Details");
               setShowApiData(true);
