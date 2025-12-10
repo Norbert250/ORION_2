@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,6 +8,7 @@ import { ApplicationFormData } from "@/types/form";
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { GradientCircularProgress } from "@/components/GradientCircularProgress";
 import { CircularProgress } from "@/components/CircularProgress";
+import { InfoModal } from "./medicalResultsModal";
 
 
 interface StepThreeProps {
@@ -21,6 +22,10 @@ interface StepThreeProps {
 export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackFieldChange }: StepThreeProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  useEffect(() => {
+    setIsModalOpen(true);
+  }, []);
 
   
   // Calculate real-time scores from API responses
@@ -319,6 +324,14 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
 
   return (
     <div className="max-w-4xl mx-auto">
+       <InfoModal
+  isOpen={isModalOpen}
+  message="You can save more with COVA when you choose the best financing option tailored for you."
+  onClose={() => setIsModalOpen(false)}
+  onContinue={() => {
+    setIsModalOpen(false) 
+  }}
+/>
       <Card className="p-6 md:p-8">
       {/* Score Section */}
       <Card className="mb-6 p-6 bg-gradient-to-br from-[#123264] to-[#0090ff] border shadow-md">

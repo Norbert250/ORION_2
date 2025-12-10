@@ -139,14 +139,15 @@ export const StepOne = ({ formData, updateFormData, nextStep, trackFieldChange }
 
         <div className="flex gap-4 pt-6">
           <Button
-            type="button"
-            variant="outline"
-            onClick={() => window.history.back()}
-            className="flex-1"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back
-          </Button>
+  type="button"
+  variant="outline"
+  onClick={() => window.location.href = "https://checkupsmed.com"}
+  className="flex-1"
+>
+  <ArrowLeft className="mr-2 h-4 w-4" />
+  Back
+</Button>
+
           <Button
             type="button"
             onClick={handleNext}
