@@ -88,6 +88,9 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
   const analyzeAssets = async (files: File[]) => {
     const formData = new FormData();
     
+    formData.append('user_id', '8988');
+    formData.append('loan_id', 'LOAN_' + Date.now());
+    
     files.forEach(file => {
       formData.append('files', file);
     });
