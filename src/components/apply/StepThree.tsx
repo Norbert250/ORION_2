@@ -88,19 +88,15 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
   const analyzeAssets = async (files: File[]) => {
     const formData = new FormData();
     
-    formData.append('user_id', '8988');
-    formData.append('loan_id', 'LOAN_' + Date.now());
-    
     files.forEach(file => {
       formData.append('files', file);
     });
     
-    console.log('Sending to Assets API:', 'https://157.245.20.199:8000/api/v1/process-images');
+    console.log('Sending to Assets API:', 'https://credit-scoring-api-30ec.onrender.com/api/v1/process-images');
     
-    const response = await fetch('https://157.245.20.199:8000/api/v1/process-images', {
+    const response = await fetch('https://credit-scoring-api-30ec.onrender.com/api/v1/process-images', {
       method: 'POST',
       body: formData,
-      mode: 'cors',
     });
     
     if (!response.ok) {
