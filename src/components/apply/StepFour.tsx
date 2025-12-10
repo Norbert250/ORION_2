@@ -81,25 +81,31 @@ export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFi
   };
 
   const analyzeId = async (file: File) => {
-    const formData = new FormData();
-    formData.append('image', file);
-    
-    console.log('Analyzing ID document...');
-    
-    const response = await fetch('https://orionapisalpha.onrender.com/id/analyze', {
-      method: 'POST',
-      body: formData,
-    });
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('ID Analysis API Error:', errorText);
-      throw new Error(`ID analysis failed: ${response.statusText}`);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      
+      console.log('Analyzing ID document...');
+      
+      const response = await fetch('https://orionapisalpha.onrender.com/id/analyze', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('ID Analysis API Error:', errorText);
+        throw new Error(`ID analysis failed: ${response.statusText}`);
+      }
+      
+      const result = await response.json();
+      console.log('ID Analysis Response:', result);
+      return result;
+    } catch (error) {
+      console.error('ID Analysis failed:', error);
+      // Return null instead of throwing to prevent app crash
+      return null;
     }
-    
-    const result = await response.json();
-    console.log('ID Analysis Response:', result);
-    return result;
   };
 
   const handleNext = () => {
@@ -224,9 +230,12 @@ export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFi
                         setLoadingMessage('Analyzing guarantor 1 ID...');
                         console.log('🔄 Starting guarantor 1 ID analysis...');
                         const guarantor1IdAnalysis = await analyzeId(file);
-                        console.log('✅ Guarantor 1 ID analysis complete:', guarantor1IdAnalysis);
-                        
-                        updateFormData({ guarantor1IdAnalysis });
+                        if (guarantor1IdAnalysis) {
+                          console.log('✅ Guarantor 1 ID analysis complete:', guarantor1IdAnalysis);
+                          updateFormData({ guarantor1IdAnalysis });
+                        } else {
+                          console.log('⚠️ Guarantor 1 ID analysis failed, continuing without analysis');
+                        }
                       } catch (error) {
                         console.error('❌ Guarantor 1 ID analysis error:', error);
                       } finally {
@@ -315,9 +324,12 @@ export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFi
                         setLoadingMessage('Analyzing guarantor 2 ID...');
                         console.log('🔄 Starting guarantor 2 ID analysis...');
                         const guarantor2IdAnalysis = await analyzeId(file);
-                        console.log('✅ Guarantor 2 ID analysis complete:', guarantor2IdAnalysis);
-                        
-                        updateFormData({ guarantor2IdAnalysis });
+                        if (guarantor2IdAnalysis) {
+                          console.log('✅ Guarantor 2 ID analysis complete:', guarantor2IdAnalysis);
+                          updateFormData({ guarantor2IdAnalysis });
+                        } else {
+                          console.log('⚠️ Guarantor 2 ID analysis failed, continuing without analysis');
+                        }
                       } catch (error) {
                         console.error('❌ Guarantor 2 ID analysis error:', error);
                       } finally {
