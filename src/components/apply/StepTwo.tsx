@@ -21,6 +21,8 @@ interface StepTwoProps {
 export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFieldChange }: StepTwoProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
+  const [isPrescriptionLoading, setIsPrescriptionLoading] = useState(false);
+  const [isDrugImageLoading, setIsDrugImageLoading] = useState(false);
   
   // Calculate real-time scores from API responses
   const baseMedicalScore = formData?.medicalScore?.scoring?.total_score || 
@@ -127,9 +129,11 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
   };
 
   const handleNext = () => {
-    if (formData.sex && formData.age) {
+    if (formData.sex && formData.age && !isPrescriptionLoading && !isDrugImageLoading) {
       trackFieldChange?.('stepTwo_completed');
       nextStep();
+    } else if (isPrescriptionLoading || isDrugImageLoading) {
+      alert("Please wait for the analysis to complete");
     } else {
       alert("Please fill in sex and age");
     }
@@ -278,6 +282,7 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
                     
                     if (allFiles.length > 0) {
                       try {
+                        setIsPrescriptionLoading(true);
                         setIsLoading(true);
                         setLoadingMessage('Analyzing prescriptions...');
                         console.log('🔄 Starting prescription analysis...');
@@ -290,6 +295,7 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
                       } catch (error) {
                         console.error('❌ Prescription analysis error:', error);
                       } finally {
+                        setIsPrescriptionLoading(false);
                         setIsLoading(false);
                         setLoadingMessage('');
                       }
@@ -343,6 +349,7 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
                     
                     if (allFiles.length > 0) {
                       try {
+                        setIsDrugImageLoading(true);
                         setIsLoading(true);
                         setLoadingMessage('Analyzing drugs...');
                         console.log('🔄 Starting drug analysis for all files...');
@@ -377,6 +384,7 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
                       } catch (error) {
                         console.error('❌ Drug analysis error:', error);
                       } finally {
+                        setIsDrugImageLoading(false);
                         setIsLoading(false);
                         setLoadingMessage('');
                       }
@@ -405,10 +413,10 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
           <Button
             type="button"
             onClick={handleNext}
-            disabled={isLoading}
+            disabled={isPrescriptionLoading || isDrugImageLoading || !formData.sex || !formData.age}
             className="flex-1 bg-primary hover:bg-primary/90 min-w-0"
           >
-            {isLoading ? (
+            {(isPrescriptionLoading || isDrugImageLoading) ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin flex-shrink-0" />
                 <span className="truncate">{loadingMessage}</span>
