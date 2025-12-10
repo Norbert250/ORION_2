@@ -95,9 +95,9 @@ export const StepThree = ({ formData, updateFormData, nextStep, prevStep, trackF
       formData.append('files', file);
     });
     
-    console.log('Sending to Assets API:', 'http://157.245.20.199:8000/api/v1/process-images');
+    console.log('Sending to Assets API:', 'https://157.245.20.199:8000/api/v1/process-images');
     
-    const response = await fetch('http://157.245.20.199:8000/api/v1/process-images', {
+    const response = await fetch('https://157.245.20.199:8000/api/v1/process-images', {
       method: 'POST',
       body: formData,
     });
