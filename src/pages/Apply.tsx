@@ -71,11 +71,15 @@ const Apply = () => {
       <div className="mx-auto max-w-6xl">
         {/* Header */}
         <div className="text-center space-y-2 mb-6 sm:mb-8">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-2">
-            <Activity className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary">Checkups Orion</h1>
-          </div>
           <p className="text-muted-foreground text-base sm:text-lg">Credit Application Form</p>
+        </div>
+
+        {/* Floating Powered by ORION Widget */}
+        <div className="fixed top-4 right-4 z-50">
+          <div className="bg-white/90 backdrop-blur-sm border border-gray-200 rounded-full px-3 py-1.5 shadow-lg">
+            <span className="text-xs font-medium text-gray-600">powered by </span>
+            <span className="text-xs font-bold text-[#0090ff]">ORION</span>
+          </div>
         </div>
 
         {/* Progress Indicator */}
