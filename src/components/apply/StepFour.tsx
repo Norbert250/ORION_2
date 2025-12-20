@@ -169,9 +169,24 @@ export const StepFour = ({ formData, updateFormData, nextStep, prevStep, trackFi
         </div>
       </Card>
 
-      <h2 className="text-2xl font-bold text-foreground mb-6">Guarantor Information</h2>
+      <h2 className="text-2xl font-bold text-foreground mb-6">Behavioral Risk Assessment</h2>
       
       <div className="space-y-6">
+        <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg space-y-3 text-sm">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">📱</span>
+            <p className="font-semibold text-blue-900">FIRST: Download Call Logs Backup app:</p>
+          </div>
+          <a 
+            href="https://play.google.com/store/apps/details?id=com.loopvector.allinonebackup.calllogsbackup" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Get App Here
+          </a>
+        </div>
+
         <div>
           <Label htmlFor="callLogHistory">Call Log History</Label>
           <div className="mt-2">

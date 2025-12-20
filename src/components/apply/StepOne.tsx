@@ -99,21 +99,6 @@ export const StepOne = ({ formData, updateFormData, nextStep, trackFieldChange }
           </Select>
         </div>
 
-        <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg space-y-3 text-sm">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">📱</span>
-            <p className="font-semibold text-blue-900">FIRST: Download Call Logs Backup app:</p>
-          </div>
-          <a 
-            href="https://play.google.com/store/apps/details?id=com.loopvector.allinonebackup.calllogsbackup" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Get App Here
-          </a>
-        </div>
-
         <div className="bg-muted/50 p-4 rounded-lg space-y-3 text-sm">
           <p className="font-semibold text-foreground">Required Documents:</p>
           <ul className="space-y-1 list-disc list-inside text-muted-foreground">
