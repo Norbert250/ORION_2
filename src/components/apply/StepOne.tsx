@@ -56,6 +56,7 @@ export const StepOne = ({ formData, updateFormData, nextStep, trackFieldChange }
             <SelectContent>
               <SelectItem value="employed">Employed</SelectItem>
               <SelectItem value="selfemployed">Self-employed</SelectItem>
+              <SelectItem value="businessowner">Business Owner</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -93,6 +94,19 @@ export const StepOne = ({ formData, updateFormData, nextStep, trackFieldChange }
                   <SelectItem value="Electronics repairers">Electronics repairers</SelectItem>
                   <SelectItem value="Mechanicians">Mechanicians</SelectItem>
                   <SelectItem value="Hair dressers">Hair dressers</SelectItem>
+                </>
+              ) : formData.sector === 'businessowner' ? (
+                <>
+                  <SelectItem value="Retail Business">Retail Business</SelectItem>
+                  <SelectItem value="Restaurant/Food Service">Restaurant/Food Service</SelectItem>
+                  <SelectItem value="Manufacturing">Manufacturing</SelectItem>
+                  <SelectItem value="Technology/IT Services">Technology/IT Services</SelectItem>
+                  <SelectItem value="Construction Company">Construction Company</SelectItem>
+                  <SelectItem value="Transportation/Logistics">Transportation/Logistics</SelectItem>
+                  <SelectItem value="Real Estate">Real Estate</SelectItem>
+                  <SelectItem value="Healthcare Services">Healthcare Services</SelectItem>
+                  <SelectItem value="Education/Training">Education/Training</SelectItem>
+                  <SelectItem value="Other Business">Other Business</SelectItem>
                 </>
               ) : null}
             </SelectContent>
