@@ -13,7 +13,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 210 100% 1%;
 
-    --primary: 210 100% 50%; /* #0090ff */
+    --primary: 206 100% 50%; /* #0090FF - Brand Match */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 200 20% 98%; /* Light Medical Blue */
@@ -22,24 +22,24 @@
     --muted: 200 15% 96%;
     --muted-foreground: 220 7% 39%; /* #60646b */
 
-    --accent: 210 100% 50%; /* #0090ff */
+    --accent: 206 100% 50%; /* #0090FF - Brand Match */
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 356 78% 54%; /* #E42D35 */
+    --destructive: 351 90% 55%; /* #F42342 - Brand Match */
     --destructive-foreground: 0 0% 100%;
 
     --border: 220 15% 84%; /* #D3D8DE */
     --input: 220 15% 84%;
-    --ring: 210 100% 50%; /* #0090ff */
+    --ring: 206 100% 50%; /* #0090FF */
 
     --radius: 1rem;
     
     --health-orange: 28 100% 50%;
     --health-yellow: 45 93% 47%;
-    --health-green: 210 100% 50%; /* #0090ff */
-    --health-red: 0 84% 60%;
-    --medical-blue: 210 100% 50%; /* #0090ff */
-    --medical-teal: 210 100% 50%; /* #0090ff */
+    --health-green: 206 100% 50%; /* #0090FF */
+    --health-red: 351 90% 55%; /* #F42342 */
+    --medical-blue: 206 100% 50%; /* #0090FF */
+    --medical-teal: 206 100% 50%; /* #0090FF */
     --medical-light: 200 20% 98%;
     --medical-dark: 220 65% 24%; /* #123264 */
     --tier-background: 220 65% 24%; /* #123264 */
