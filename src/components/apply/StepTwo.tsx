@@ -68,7 +68,33 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
     }
   };
 
-  const predictMedicalNeeds = async (drugNames: string[], retries = 3) => {
+  const analyzeUserId = async (file: File) => {
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      formData.append('user_id', 'USER_' + Date.now());
+      
+      console.log('Analyzing user ID document...');
+      
+      const response = await fetch('https://orionapisalpha.onrender.com/userid/extract', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('User ID Analysis API Error:', errorText);
+        throw new Error(`User ID analysis failed: ${response.statusText}`);
+      }
+      
+      const result = await response.json();
+      console.log('User ID Analysis Response:', result);
+      return result;
+    } catch (error) {
+      console.error('User ID Analysis failed:', error);
+      throw error;
+    }
+  };
     if (!navigator.onLine) throw new Error('No internet connection');
     
     for (let i = 0; i < retries; i++) {
@@ -129,13 +155,13 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
   };
 
   const handleNext = () => {
-    if (formData.sex && formData.age && !isPrescriptionLoading && !isDrugImageLoading) {
+    if (formData.userIdAnalysis?.extracted_fields?.Gender && formData.userIdAnalysis?.extracted_fields?.['Date of Birth']) {
       trackFieldChange?.('stepTwo_completed');
       nextStep();
     } else if (isPrescriptionLoading || isDrugImageLoading) {
       alert("Please wait for the analysis to complete");
     } else {
-      alert("Please fill in sex and age");
+      alert("Please upload your ID document to extract gender and date of birth");
     }
   };
 
@@ -194,55 +220,99 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
       <h2 className="text-2xl font-bold text-foreground mb-6">Personal & Medical Information</h2>
       
       <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-4">
           <div>
-            <Label htmlFor="sex">Sex *</Label>
-            <Select
-              value={formData.sex}
-              onValueChange={(value) => updateFormData({ sex: value })}
-              onOpenChange={(open) => open && trackFieldChange?.('sex')}
-            >
-              <SelectTrigger className="mt-2">
-                <SelectValue placeholder="Select sex" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="male">Male</SelectItem>
-                <SelectItem value="female">Female</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <Label htmlFor="yearOfBirth">Year of Birth *</Label>
-            <Select
-              value={formData.yearOfBirth}
-              onValueChange={(value) => {
-                const currentYear = new Date().getFullYear();
-                const calculatedAge = (currentYear - parseInt(value)).toString();
-                updateFormData({ yearOfBirth: value, age: calculatedAge });
-              }}
-              onOpenChange={(open) => open && trackFieldChange?.('yearOfBirth')}
-            >
-              <SelectTrigger className="mt-2">
-                <SelectValue placeholder="Select year of birth" />
-              </SelectTrigger>
-              <SelectContent>
-                {Array.from({ length: 2025 - 1900 + 1 }, (_, i) => {
-                  const year = 2025 - i;
-                  return (
-                    <SelectItem key={year} value={year.toString()}>
-                      {year}
-                    </SelectItem>
-                  );
-                })}
-              </SelectContent>
-            </Select>
-            {formData.yearOfBirth && (
-              <p className="text-sm text-muted-foreground mt-1">
-                Age: {formData.age} years old
-              </p>
-            )}
+            <Label htmlFor="userId">Upload Your ID Document *</Label>
+            <div className="mt-2">
+              <Input
+                id="userId"
+                type="file"
+                accept="image/*,.pdf"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0] || null;
+                  updateFormData({ userId: file });
+                  
+                  if (file) {
+                    try {
+                      setIsLoading(true);
+                      setLoadingMessage('Analyzing ID document...');
+                      console.log('🔄 Starting user ID analysis...');
+                      const userIdAnalysis = await analyzeUserId(file);
+                      console.log('✅ User ID analysis complete:', userIdAnalysis);
+                      
+                      // Extract gender and calculate age from date of birth
+                      const extractedFields = userIdAnalysis.extracted_fields;
+                      const dateOfBirth = extractedFields['Date of Birth'];
+                      const gender = extractedFields.Gender;
+                      
+                      let calculatedAge = '';
+                      if (dateOfBirth) {
+                        const birthYear = new Date(dateOfBirth).getFullYear();
+                        const currentYear = new Date().getFullYear();
+                        calculatedAge = (currentYear - birthYear).toString();
+                      }
+                      
+                      updateFormData({ 
+                        userIdAnalysis,
+                        sex: gender?.toLowerCase(),
+                        age: calculatedAge,
+                        yearOfBirth: dateOfBirth ? new Date(dateOfBirth).getFullYear().toString() : ''
+                      });
+                    } catch (error) {
+                      console.error('❌ User ID analysis error:', error);
+                      alert('Failed to analyze ID document. Please try again.');
+                    } finally {
+                      setIsLoading(false);
+                      setLoadingMessage('');
+                    }
+                  }
+                }}
+                onFocus={() => trackFieldChange?.('userId')}
+                className="cursor-pointer"
+              />
+              {formData.userId && (
+                <div className="mt-2">
+                  <div className="relative inline-block">
+                    <img
+                      src={URL.createObjectURL(formData.userId)}
+                      alt="User ID"
+                      className="w-24 h-16 object-cover rounded border mb-2"
+                    />
+                    <button
+                      onClick={() => updateFormData({ userId: null, userIdAnalysis: null, sex: '', age: '', yearOfBirth: '' })}
+                      className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center"
+                    >
+                      ×
+                    </button>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    {formData.userId.name}
+                  </p>
+                  {formData.userIdAnalysis?.extracted_fields && (
+                    <div className="bg-[#f4faff] p-3 rounded-lg text-sm">
+                      <h4 className="font-semibold text-[#123264] mb-2">Extracted Information:</h4>
+                      <div className="space-y-1">
+                        {formData.userIdAnalysis.extracted_fields['Full Name'] && (
+                          <p><span className="font-medium">Name:</span> {formData.userIdAnalysis.extracted_fields['Full Name']}</p>
+                        )}
+                        {formData.userIdAnalysis.extracted_fields.Gender && (
+                          <p><span className="font-medium">Gender:</span> {formData.userIdAnalysis.extracted_fields.Gender}</p>
+                        )}
+                        {formData.userIdAnalysis.extracted_fields['Date of Birth'] && (
+                          <p><span className="font-medium">Date of Birth:</span> {formData.userIdAnalysis.extracted_fields['Date of Birth']}</p>
+                        )}
+                        {formData.userIdAnalysis.extracted_fields['ID Number'] && (
+                          <p><span className="font-medium">ID Number:</span> {formData.userIdAnalysis.extracted_fields['ID Number']}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            <p className="text-xs text-[#60646b] font-medium mt-1">
+              📄 Upload your ID document to automatically extract gender and date of birth
+            </p>
           </div>
         </div>
 
@@ -413,7 +483,7 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
           <Button
             type="button"
             onClick={handleNext}
-            disabled={isPrescriptionLoading || isDrugImageLoading || !formData.sex || !formData.age}
+            disabled={isPrescriptionLoading || isDrugImageLoading || !formData.userIdAnalysis?.extracted_fields?.Gender || !formData.userIdAnalysis?.extracted_fields?.['Date of Birth']}
             className="flex-1 bg-primary hover:bg-primary/90 min-w-0"
           >
             {(isPrescriptionLoading || isDrugImageLoading) ? (

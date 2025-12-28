@@ -7,6 +7,8 @@ export interface ApplicationFormData {
   sex: string;
   age: string;
   yearOfBirth?: string;
+  userId?: File | null;
+  userIdAnalysis?: any;
   medicalPrescription: File[];
   drugImage: File[];
   assetPictures: File[];
