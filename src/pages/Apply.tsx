@@ -47,6 +47,8 @@ const Apply = () => {
   };
 
   const handleTimeUp = () => {
+    // Track time runout in user tracking
+    trackFieldChange?.('time_runout');
     alert("Time's up! Your session has expired. Please start over.");
     navigate("/");
   };
