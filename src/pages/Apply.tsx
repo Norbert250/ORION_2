@@ -15,7 +15,8 @@ const Apply = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
-  const [timerStarted, setTimerStarted] = useState(false);
+  const [stepTimers, setStepTimers] = useState<{[key: number]: number}>({});
+  const [currentStepTime, setCurrentStepTime] = useState(5 * 60);
   const [formData, setFormData] = useState<ApplicationFormData>({
     phoneNumber: "",
     occupation: "",
@@ -42,9 +43,6 @@ const Apply = () => {
   const { trackFieldChange, markAsSubmitted } = useUserTracking(formData.phoneNumber, currentStep);
 
   const updateFormData = (data: Partial<ApplicationFormData>) => {
-    if (!timerStarted) {
-      setTimerStarted(true);
-    }
     setFormData((prev) => ({ ...prev, ...data }));
   };
 
@@ -55,13 +53,22 @@ const Apply = () => {
 
   const nextStep = () => {
     if (currentStep < 5) {
+      // Save current step time
+      setStepTimers(prev => ({ ...prev, [currentStep]: currentStepTime }));
       setCurrentStep(currentStep + 1);
+      // Reset timer to 5 minutes for new step
+      setCurrentStepTime(5 * 60);
     }
   };
 
   const prevStep = () => {
     if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
+      // Save current step time
+      setStepTimers(prev => ({ ...prev, [currentStep]: currentStepTime }));
+      const prevStepNumber = currentStep - 1;
+      setCurrentStep(prevStepNumber);
+      // Restore previous step time or start fresh
+      setCurrentStepTime(stepTimers[prevStepNumber] || 5 * 60);
     }
   };
 
@@ -93,9 +100,12 @@ const Apply = () => {
         </div>
 
         {/* Timer */}
-        {timerStarted && (
-          <Timer onTimeUp={handleTimeUp} maxMinutes={5} />
-        )}
+        <Timer 
+          key={currentStep} 
+          initialTime={currentStepTime}
+          onTimeUpdate={setCurrentStepTime}
+          onTimeUp={handleTimeUp} 
+        />
 
         {/* Progress Indicator */}
         <div className="mb-6 sm:mb-8">

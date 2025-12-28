@@ -2,12 +2,17 @@ import { useState, useEffect } from 'react';
 import { Clock } from 'lucide-react';
 
 interface TimerProps {
+  initialTime: number;
+  onTimeUpdate: (time: number) => void;
   onTimeUp: () => void;
-  maxMinutes?: number;
 }
 
-export const Timer = ({ onTimeUp, maxMinutes = 5 }: TimerProps) => {
-  const [timeLeft, setTimeLeft] = useState(maxMinutes * 60); // Convert to seconds
+export const Timer = ({ initialTime, onTimeUpdate, onTimeUp }: TimerProps) => {
+  const [timeLeft, setTimeLeft] = useState(initialTime);
+  
+  useEffect(() => {
+    setTimeLeft(initialTime);
+  }, [initialTime]);
   
   useEffect(() => {
     if (timeLeft <= 0) {
@@ -16,11 +21,15 @@ export const Timer = ({ onTimeUp, maxMinutes = 5 }: TimerProps) => {
     }
     
     const timer = setInterval(() => {
-      setTimeLeft(prev => prev - 1);
+      setTimeLeft(prev => {
+        const newTime = prev - 1;
+        onTimeUpdate(newTime);
+        return newTime;
+      });
     }, 1000);
     
     return () => clearInterval(timer);
-  }, [timeLeft, onTimeUp]);
+  }, [timeLeft, onTimeUp, onTimeUpdate]);
   
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
