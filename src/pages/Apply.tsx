@@ -6,6 +6,7 @@ import { StepTwo } from "@/components/apply/StepTwo";
 import { StepThree } from "@/components/apply/StepThree";
 import { StepFour } from "@/components/apply/StepFour";
 import { StepFive } from "@/components/apply/StepFive";
+import { Timer } from "@/components/Timer";
 import { useUserTracking } from "@/hooks/useUserTracking";
 
 import { ApplicationFormData } from "@/types/form";
@@ -14,6 +15,7 @@ const Apply = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [currentStep, setCurrentStep] = useState(1);
+  const [timerStarted, setTimerStarted] = useState(false);
   const [formData, setFormData] = useState<ApplicationFormData>({
     phoneNumber: "",
     occupation: "",
@@ -40,7 +42,15 @@ const Apply = () => {
   const { trackFieldChange, markAsSubmitted } = useUserTracking(formData.phoneNumber, currentStep);
 
   const updateFormData = (data: Partial<ApplicationFormData>) => {
+    if (!timerStarted) {
+      setTimerStarted(true);
+    }
     setFormData((prev) => ({ ...prev, ...data }));
+  };
+
+  const handleTimeUp = () => {
+    alert("Time's up! Your session has expired. Please start over.");
+    navigate("/");
   };
 
   const nextStep = () => {
@@ -81,6 +91,11 @@ const Apply = () => {
             <span className="text-xs font-bold text-[#0090ff]">ORION</span>
           </div>
         </div>
+
+        {/* Timer */}
+        {timerStarted && (
+          <Timer onTimeUp={handleTimeUp} maxMinutes={5} />
+        )}
 
         {/* Progress Indicator */}
         <div className="mb-6 sm:mb-8">
