@@ -95,6 +95,8 @@ export const StepTwo = ({ formData, updateFormData, nextStep, prevStep, trackFie
       throw error;
     }
   };
+
+  const predictMedicalNeeds = async (drugNames: string[], retries = 3) => {
     if (!navigator.onLine) throw new Error('No internet connection');
     
     for (let i = 0; i < retries; i++) {
