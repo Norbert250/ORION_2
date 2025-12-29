@@ -184,7 +184,7 @@ export class DatabaseService {
   static async updateUserSession(sessionId: string, updates: {
     current_step?: number;
     current_field?: string;
-    status?: 'inprogress' | 'submitted' | 'left';
+    status?: 'inprogress' | 'submitted' | 'left' | 'time_runout';
   }) {
     const { error } = await supabase
       .from('user_sessions')
