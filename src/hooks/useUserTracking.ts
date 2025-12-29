@@ -4,6 +4,7 @@ import { DatabaseService } from '@/lib/database';
 export const useUserTracking = (phoneNumber: string, currentStep: number) => {
   const sessionId = useRef<string>('');
   const isInitialized = useRef(false);
+  const currentStatus = useRef<string>('active');
 
   useEffect(() => {
     if (!phoneNumber) return;
@@ -25,11 +26,13 @@ export const useUserTracking = (phoneNumber: string, currentStep: number) => {
     createSession();
 
     const handleBeforeUnload = () => {
-      DatabaseService.updateUserSession(sessionId.current, { status: 'left' });
+      if (currentStatus.current !== 'time_runout') {
+        DatabaseService.updateUserSession(sessionId.current, { status: 'left' });
+      }
     };
 
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') {
+      if (document.visibilityState === 'hidden' && currentStatus.current !== 'time_runout') {
         DatabaseService.updateUserSession(sessionId.current, { status: 'left' });
       }
     };
@@ -37,7 +40,7 @@ export const useUserTracking = (phoneNumber: string, currentStep: number) => {
     let currentUrl = window.location.href;
     
     const checkUrlChange = () => {
-      if (window.location.href !== currentUrl) {
+      if (window.location.href !== currentUrl && currentStatus.current !== 'time_runout') {
         DatabaseService.updateUserSession(sessionId.current, { status: 'left' });
         currentUrl = window.location.href;
       }
@@ -93,6 +96,7 @@ export const useUserTracking = (phoneNumber: string, currentStep: number) => {
 
   const setStatus = (status: string) => {
     if (sessionId.current) {
+      currentStatus.current = status;
       DatabaseService.updateUserSession(sessionId.current, { status });
     }
   };
