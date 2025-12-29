@@ -91,5 +91,11 @@ export const useUserTracking = (phoneNumber: string, currentStep: number) => {
     }
   };
 
-  return { trackFieldChange, markAsSubmitted };
+  const setStatus = (status: string) => {
+    if (sessionId.current) {
+      DatabaseService.updateUserSession(sessionId.current, { status });
+    }
+  };
+
+  return { trackFieldChange, markAsSubmitted, setStatus };
 };

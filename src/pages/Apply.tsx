@@ -40,15 +40,15 @@ const Apply = () => {
     guarantor2Phone: "",
   });
 
-  const { trackFieldChange, markAsSubmitted } = useUserTracking(formData.phoneNumber, currentStep);
+  const { trackFieldChange, markAsSubmitted, setStatus } = useUserTracking(formData.phoneNumber, currentStep);
 
   const updateFormData = (data: Partial<ApplicationFormData>) => {
     setFormData((prev) => ({ ...prev, ...data }));
   };
 
   const handleTimeUp = () => {
-    // Track time runout in user tracking
-    trackFieldChange?.('time_runout');
+    // Set status to time_runout in user tracking
+    setStatus('time_runout');
     alert("Time's up! Your session has expired. Please start over.");
     navigate("/");
   };
